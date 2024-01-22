@@ -32,10 +32,14 @@ class UserLoginView(generics.GenericAPIView):
                 token = Token.objects.create(user=user)
                 team = Team.objects.get(owner=user)
                 team_data = TeamSerializer(team).data
+                # return Response({
+                #     'message': f'Welcome {user.name} to the Soccer Game Console. Here is your Team {team} details',
+                #    # 'token': token.key, # Hiding the token for now
+                #     'team': team_data
+                # })
                 return Response({
-                    'message': f'Welcome {user.name} to the Soccer Game Console. Here is your Team {team} details',
-                   # 'token': token.key, # Hiding the token for now
-                    'team': team_data
+                    'status': 'Successfuly logged in!',
+                    'message': f'Welcome {user.name} to the Soccer Game Console.'
                 })
         else:
             return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
