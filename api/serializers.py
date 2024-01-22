@@ -104,3 +104,4 @@ class UserTeamDetailSerializer(serializers.ModelSerializer):
     def get_welcome_message(self, obj):
         return f'Welcome {obj.name} to the Soccer Game Console. Here is your Team {obj.team.name} details'
 
+"""Test String"""
