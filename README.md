@@ -1,6 +1,4 @@
-![Soccer](api/static/Soccer.jpg)
+# Soccer Online Game Manager App API. 
 
-# This is a Test Project.
-
-## Welcome to Soccer App API . 
+![Soccer](api/static/under-construction.jpg)
 
