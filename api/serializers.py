@@ -105,3 +105,5 @@ class UserTeamDetailSerializer(serializers.ModelSerializer):
         return f'Welcome {obj.name} to the Soccer Game Console. Here is your Team {obj.team.name} details'
 
 """Test String"""
+
+"""Test String 2"""
