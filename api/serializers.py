@@ -100,9 +100,17 @@ class UserDetailSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['username', 'name', 'team']
     
-# Player Transfer List Create
+# Transfer List Create
 
-class PlayerTransferSerializer(serializers.Serializer):
-    asking_price = serializers.DecimalField(max_digits=10, decimal_places=2)
+class TransferListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TransferList
+        fields = '__all__'
 
-    
+
+# Market List View
+        
+class MarketListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TransferList
+        fields = '__all__'

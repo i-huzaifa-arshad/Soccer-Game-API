@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from .models import *
 from .serializers import *
-from uuid import UUID
 
 
 # User Register
@@ -234,3 +233,16 @@ class PlayerUpdateView(generics.UpdateAPIView):
             return Response({'message': f'Owner *{username}* of the Team *{teamname}* not logged in. Please login first to update this player record.'}, status=status.HTTP_400_BAD_REQUEST)
 
         return super().update(request, *args, **kwargs)
+
+# Transfer List Create
+    
+class TransferListView(generics.CreateAPIView):
+    serializer_class = TransferListSerializer
+    
+
+# Transfer List View
+    
+class MarketListView(generics.ListAPIView):
+    queryset = TransferList.objects.all()
+    serializer_class = MarketListSerializer
+    
