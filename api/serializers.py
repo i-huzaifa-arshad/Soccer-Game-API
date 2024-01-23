@@ -50,7 +50,7 @@ class UserLoginSerializer(serializers.Serializer):
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['username', 'name', 'email'] 
+        fields = ['username', 'name'] 
 
 # User Update
     
@@ -91,15 +91,18 @@ class TeamUpdateSerializer(serializers.ModelSerializer):
         model = Team
         fields = ['name', 'country']
 
-# User Team Details View
+# User Details View
 
-class UserTeamDetailSerializer(serializers.ModelSerializer):
+class UserDetailSerializer(serializers.ModelSerializer):
     team = TeamSerializer(read_only=True)
-    welcome_message = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
-        fields = ['welcome_message', 'team']
+        fields = ['username', 'name', 'team']
     
-    def get_welcome_message(self, obj):
-        return f'Welcome {obj.name} to the Soccer Game Console. Here is your Team {obj.team.name} details'
+# Player Transfer List Create
+
+class PlayerTransferSerializer(serializers.Serializer):
+    asking_price = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    

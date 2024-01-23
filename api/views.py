@@ -35,7 +35,8 @@ class UserLoginView(generics.GenericAPIView):
                 team = Team.objects.get(owner=user)
                 team_data = TeamSerializer(team).data
                 return Response({
-                    'message': f'Welcome *{user.name}* to the Soccer Online Game Manager Console. Your Team *{team}* is waiting for you!',
+                    'message': f'Welcome *{user.name}* to the Soccer Online Game Manager Console. Your team details are as follows:',
+                    'team': team_data
                    # 'token': token.key # Hiding the token for now
                 })
         else:
@@ -63,11 +64,11 @@ class UserListView(generics.ListAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserListSerializer
 
-# User Team Details
+# User Details
     
-class UserTeamDetailView(generics.RetrieveAPIView):
+class UserDetailView(generics.RetrieveAPIView):
     queryset = CustomUser.objects.all()
-    serializer_class = UserTeamDetailSerializer
+    serializer_class = UserDetailSerializer
     lookup_field = 'username'
 
     ''' Check if user is logged in or not. If logged in,
