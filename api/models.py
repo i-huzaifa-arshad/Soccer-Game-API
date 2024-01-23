@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 import pycountry
+import uuid
 
 # For making a custom user instead of using django's built-in user
 
@@ -49,7 +50,8 @@ class Player(models.Model):
         ('Midfielder', 'Midfielder'),
         ('Attacker', 'Attacker'),
     ]
-    id = models.AutoField(primary_key=True)
+    # id = models.AutoField(primary_key=True) # Experiment with UUID
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     country = models.CharField(max_length=80, choices=[(country, country) for country in COUNTRIES])
