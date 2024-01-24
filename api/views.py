@@ -1,10 +1,11 @@
 from django.contrib.auth import authenticate
 from rest_framework import generics, status
 from rest_framework.response import Response
+from django.db import IntegrityError
+from rest_framework import filters
 from rest_framework.authtoken.models import Token
 from .models import *
 from .serializers import *
-
 
 # User Register
 
@@ -177,35 +178,6 @@ class TeamUpdateView(generics.UpdateAPIView):
 
 # Player Update
     
-# # With simple ID
-# class PlayerUpdateView(generics.UpdateAPIView):
-#     queryset = Player.objects.all()
-#     serializer_class = PlayerUpdateSerializer
-#     lookup_url_kwarg = 'id'
-
-#     ''' Check if user is logged in or not. If logged in,
-#         proceed. Else, ask user to login first.
-#     '''
-
-#     def authenticate_user(self, request, *args, **kwargs):
-#         teamname = self.kwargs['teamname']
-#         team = Team.objects.get(name=teamname)
-#         user = team.owner
-#         username = user.username
-#         token = Token.objects.filter(user=user)
-#         if token.exists():
-#             return True, username
-#         else:
-#             return False, username
-
-#     def update(self, request, *args, **kwargs):
-#         is_authenticated, username = self.authenticate_user(request, *args, **kwargs)
-#         if not is_authenticated:
-#             return Response({'message': f'User ({username}) not logged in. Please login first.'}, status=status.HTTP_400_BAD_REQUEST)
-#         return super().update(request, *args, **kwargs)
-
-# With UUID 
-    
 class PlayerUpdateView(generics.UpdateAPIView):
     queryset = Player.objects.all()
     serializer_class = PlayerUpdateSerializer
@@ -234,15 +206,58 @@ class PlayerUpdateView(generics.UpdateAPIView):
 
         return super().update(request, *args, **kwargs)
 
-# Transfer List Create
-    
-class TransferListView(generics.CreateAPIView):
-    serializer_class = TransferListSerializer
-    
 
-# Transfer List View
+# Player Transfer List Create
+
+class TransferListView(generics.ListCreateAPIView):
+    serializer_class = TransferListSerializer
+
+    def get_user(self):
+        return CustomUser.objects.get(username=self.kwargs['username'])
+
+    def get_team(self):
+        return Team.objects.get(owner=self.get_user())
+
+    def get_queryset(self):
+        team = self.get_team()
+        return TransferList.objects.filter(player__in=team.players.all())
+
+    ''' Check if user is logged in or not. If logged in,
+        proceed. Else, ask user to login first.
+    '''
+
+    def authenticate_user(self):
+        return Token.objects.filter(user=self.get_user()).exists()
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        kwargs['context'].update({"players": self.get_team().players.all()})
+        return self.serializer_class(*args, **kwargs)
     
+    def post(self, request, *args, **kwargs):
+        if not self.authenticate_user():
+            return Response({'message': f'User *{self.get_user().username}* not logged in. Please login first to add players to transfer list.'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            transfer_list_entry = serializer.save()
+            # Create a MarketList entry for the player
+            MarketList.objects.create(transfer_list=transfer_list_entry)
+        except IntegrityError:
+            player = serializer.validated_data['player']
+            return Response({'Warning': f'Player *{player.first_name} {player.last_name}* already listed in the transfer list.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=self.get_success_headers(serializer.data))
+
+
+# Market List View
+
 class MarketListView(generics.ListAPIView):
-    queryset = TransferList.objects.all()
     serializer_class = MarketListSerializer
-    
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['transfer_list__player__first_name', 'transfer_list__player__last_name', 
+                     'transfer_list__player__country', 'transfer_list__player__team__name', 'transfer_list__asking_price']
+
+    def get_queryset(self):
+        return MarketList.objects.all()
+
+

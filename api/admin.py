@@ -7,4 +7,7 @@ from .customadmin import *
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Player, PlayerAdmin)
 admin.site.register(Team, TeamAdmin)
-admin.site.register(TransferList)
+admin.site.register(TransferList, TransferListAdmin)
+admin.site.register(MarketList, MarketListAdmin)
+# admin.site.register(BuyList)
+

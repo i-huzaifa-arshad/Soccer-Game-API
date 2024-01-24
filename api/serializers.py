@@ -99,18 +99,44 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['username', 'name', 'team']
-    
+   
+
 # Transfer List Create
 
 class TransferListSerializer(serializers.ModelSerializer):
+    player = serializers.PrimaryKeyRelatedField(queryset=Player.objects.none())
+
     class Meta:
         model = TransferList
-        fields = '__all__'
+        fields = ['player', 'asking_price']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'context' in kwargs and 'players' in kwargs['context']:
+            self.fields['player'].queryset = kwargs['context']['players']
 
-# Market List View
+    # Customization for showing full name of player
         
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['player'] = instance.player.first_name + ' ' + instance.player.last_name
+        return data
+
+
+# Market List
+
 class MarketListSerializer(serializers.ModelSerializer):
+    player_name = serializers.SerializerMethodField()
+    player_country = serializers.CharField(source='transfer_list.player.country')
+    team_name = serializers.SerializerMethodField()
+    asking_price = serializers.DecimalField(source='transfer_list.asking_price', max_digits=10, decimal_places=2)
+
     class Meta:
-        model = TransferList
-        fields = '__all__'
+        model = MarketList
+        fields = ['player_name', 'player_country', 'team_name', 'asking_price']
+
+    def get_player_name(self, obj):
+        return f'{obj.transfer_list.player.first_name} {obj.transfer_list.player.last_name}'
+        
+    def get_team_name(self, obj):
+        return obj.transfer_list.player.team_set.first().name if obj.transfer_list.player.team_set.exists() else None
