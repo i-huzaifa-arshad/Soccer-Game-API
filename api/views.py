@@ -261,3 +261,32 @@ class MarketListView(generics.ListAPIView):
         return MarketList.objects.all()
 
 
+# Player Buy View
+    
+class PlayerBuyView(generics.CreateAPIView):
+    serializer_class = PlayerBuySerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        player = serializer.validated_data['player']
+        buyer = serializer.validated_data['buyer']
+        buying_price = serializer.validated_data['buying_price']
+
+        if buying_price != player.transferlist.asking_price:
+            return Response({'message': 'Buying price must be equal to the asking price.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if buyer.team.budget < buying_price:
+            return Response({'message': 'Insufficient budget.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        seller = player.team.owner
+        seller.team.budget += buying_price
+        buyer.team.budget -= buying_price
+        buyer.team.players.add(player)
+        seller.team.players.remove(player)
+        player.market_value *= (1 + random.uniform(0.1, 1))
+        player.save()
+        seller.team.save()
+        buyer.team.save()
+
+        return Response({'message': 'Player bought successfully.'}, status=status.HTTP_201_CREATED)

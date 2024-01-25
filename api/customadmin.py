@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.utils.html import format_html
 from .models import *
 from faker import Faker
 import random
@@ -48,9 +47,9 @@ class PlayerAdmin(admin.ModelAdmin):
     def teams(self, obj):
         return ", ".join([team.name for team in obj.team_set.all()])
     teams.short_description = 'Team Name'
-    list_display = ('first_name', 'last_name', 'teams')
+    list_display = ('first_name', 'last_name', 'teams', 'listing_status')
     search_fields = ("first_name",)
-    list_filter = ('team__name',)
+    list_filter = ('team__name', 'listing_status',)
 
 # Customize Teams admin page
     

@@ -1,7 +1,5 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
-from django.db.models.signals import pre_delete
-from django.dispatch import receiver
 import pycountry
 import uuid
 
@@ -59,26 +57,33 @@ class Player(models.Model):
         ('Midfielder', 'Midfielder'),
         ('Attacker', 'Attacker'),
     ]
+    LISTING_STATUS_CHOICES = [
+        ('Not Listed', 'Not Listed'),
+        ('Listed', 'Listed'),
+    ]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     country = models.CharField(max_length=80, choices=[(country, country) for country in COUNTRIES])
     age = models.IntegerField()
     market_value = models.DecimalField(max_digits=10, decimal_places=2, default=1000000)
-
     position = models.CharField(max_length=15, choices=POSITION_CHOICES)
+    listing_status = models.CharField(max_length=11,choices=LISTING_STATUS_CHOICES, default='Not Listed')
+
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
     
-    # To update player country from admin panel
+    ''' 
+    To update player country from admin panel and 
+    reflect this change to all places
+    '''
+
     def save(self, *args, **kwargs):
-        # If the player exists and the country has changed
         if self.pk:
             try:
                 old_player = Player.objects.get(pk=self.pk)
                 if old_player.country != self.country:
-                    # Update the player in the TransferList and MarketList models
                     TransferList.objects.filter(player=self).update(player=self)
                     MarketList.objects.filter(transfer_list__player=self).update(country=self.country)
             except Player.DoesNotExist:
@@ -104,15 +109,6 @@ class Team(models.Model):
     @property
     def final_value(self):
         return self.team_value + self.budget
-    
-"""
-To delete all players when User or Team is deleted via 
-admin panel or user is deleted from url.
-"""
-    
-@receiver(pre_delete, sender=Team)
-def delete_players(sender, instance, **kwargs):
-    instance.players.all().delete()
 
 # Player Transfer List Create
     
@@ -126,6 +122,13 @@ class TransferList(models.Model):
     def team_name(self):
         team = self.player.team_set.first()
         return team.name if team else None
+    
+    # Test
+
+    def save(self, *args, **kwargs):
+        self.player.listing_status = 'Listed'
+        self.player.save()
+        super().save(*args, **kwargs)
 
 # Market List
     
@@ -135,5 +138,15 @@ class MarketList(models.Model):
 
     def save(self, *args, **kwargs):
         self.country = self.transfer_list.player.country
+        self.transfer_list.player.listing_status = 'Listed'
+        self.transfer_list.player.save()
         super().save(*args, **kwargs)
+
+# Player Buy
+        
+class PlayerBuy(models.Model):
+    buyer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    buying_price = models.DecimalField(max_digits=10, decimal_places=2)
+
 

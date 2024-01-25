@@ -64,7 +64,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
-        fields = ['id', 'first_name', 'last_name', 'country', 'age', 'market_value', 'position']
+        fields = ['id', 'first_name', 'last_name', 'country', 'age', 'market_value', 'position', 'listing_status']
 
 # Player Update
         
@@ -140,3 +140,10 @@ class MarketListSerializer(serializers.ModelSerializer):
         
     def get_team_name(self, obj):
         return obj.transfer_list.player.team_set.first().name if obj.transfer_list.player.team_set.exists() else None
+
+# Player Buy
+    
+class PlayerBuySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlayerBuy
+        fields = ['buyer', 'player', 'buying_price']

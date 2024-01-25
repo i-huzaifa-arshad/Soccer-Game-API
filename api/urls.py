@@ -12,5 +12,6 @@ urlpatterns = [
     path('player_update/<str:teamname>/<uuid:id>/', PlayerUpdateView.as_view(), name='player-update'),
     path('team_update/<str:owner__username>/', TeamUpdateView.as_view(), name='team-update'),
     path('transfer_list/<str:username>/', TransferListView.as_view(), name='transfer-list'),
-    path('market_list/', MarketListView.as_view(), name='market-list')
+    path('market_list/', MarketListView.as_view(), name='market-list'),
+    path('buy_player/<str:username>/', PlayerBuyView.as_view(), name='buy-player')
 ]
