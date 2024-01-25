@@ -19,6 +19,8 @@ class CustomUserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('username', 'admin')
+        extra_fields.setdefault('name', 'Admin')
         return self.create_user(email, password, **extra_fields)
 
 # To generate random countries for a team when user user signup
@@ -39,13 +41,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     team_country = models.CharField(max_length=70, choices=[(country.name, country.name) for country in pycountry.countries], null=True, blank=True)
 
     USERNAME_FIELD = 'email' 
-    
-    # To delete all teams associated with this user
-
-    def delete(self, *args, **kwargs):
-        if hasattr(self, 'team'):
-            self.team.delete()  
-        super().delete(*args, **kwargs)
     
 # Create Player Model
          
@@ -73,22 +68,6 @@ class Player(models.Model):
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
-    
-    ''' 
-    To update player country from admin panel and 
-    reflect this change to all places
-    '''
-
-    def save(self, *args, **kwargs):
-        if self.pk:
-            try:
-                old_player = Player.objects.get(pk=self.pk)
-                if old_player.country != self.country:
-                    TransferList.objects.filter(player=self).update(player=self)
-                    MarketList.objects.filter(transfer_list__player=self).update(country=self.country)
-            except Player.DoesNotExist:
-                pass
-        super().save(*args, **kwargs)
 
 # Create Team model
     
@@ -123,8 +102,6 @@ class TransferList(models.Model):
         team = self.player.team_set.first()
         return team.name if team else None
     
-    # Test
-
     def save(self, *args, **kwargs):
         self.player.listing_status = 'Listed'
         self.player.save()

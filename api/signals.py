@@ -1,7 +1,37 @@
-from django.db.models.signals import pre_delete, post_delete
+from django.db.models.signals import pre_delete, post_delete, pre_save
 from django.dispatch import receiver
 from .models import *
 
+
+# For Custom User Model
+
+"""
+To delete all teams associated with the user 
+when he is deleted from admin panel or url
+"""
+
+@receiver(pre_delete, sender=CustomUser)
+def delete_associated_team(sender, instance, **kwargs):
+    if hasattr(instance, 'team'):
+        instance.team.delete()
+
+# For Player Model
+
+''' 
+To update player country from admin panel and 
+reflect this change to all places
+'''
+
+@receiver(pre_save, sender=Player)
+def update_player_country(sender, instance, **kwargs):
+    if instance.pk: 
+        try:
+            old_player = Player.objects.get(pk=instance.pk)
+            if old_player.country != instance.country:
+                TransferList.objects.filter(player=old_player).update(player=instance)
+                MarketList.objects.filter(transfer_list__player=old_player).update(country=instance.country)
+        except Player.DoesNotExist:
+            pass
 
 # For Team Model
 
@@ -28,3 +58,5 @@ def delete_players(sender, instance, **kwargs):
     player.listing_status = 'Not Listed'
     player.save()
     instance.transfer_list.delete()
+
+

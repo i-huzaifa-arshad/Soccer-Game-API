@@ -1,12 +1,8 @@
 from rest_framework import serializers
 from .models import *
-import pycountry
-import random
-from faker import Faker
+from .helper_functions import *
 
-fake = Faker()
-
-# User Register
+# User Register Serializer
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     team_name = serializers.CharField(write_only=True)
@@ -23,57 +19,48 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         user = super().create(validated_data)
         user.set_password(validated_data['password'])
         user.save()
-        team = Team.objects.create(owner=user, name=team_name, country=team_country)
-
-        positions = ['Goalkeeper']*3 + ['Defender']*6 + ['Midfielder']*6 + ['Attacker']*5
-        for position in positions:
-            player = Player.objects.create( 
-                first_name=fake.first_name(),
-                last_name=fake.last_name(),
-                country=random.choice(COUNTRIES),
-                age=random.randint(18, 40),
-                position=position
-            )
-            team.players.add(player)
-
-        team.save()
+        """
+        Calling helper function so system can automatically
+        create player data when user signup from the url
+        """
+        user_register_create_team_and_players(user, team_name, team_country)
         return user
-    
-# User Login
+
+# User Login Serializer
     
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
-# User List
+# User List Serializer
     
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['username', 'name'] 
 
-# User Update
+# User Update Serializer
     
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['username', 'name'] 
         
-# Player Details
+# Player Details Serializer
 
 class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = ['id', 'first_name', 'last_name', 'country', 'age', 'market_value', 'position', 'listing_status']
 
-# Player Update
+# Player Update Serializer
         
 class PlayerUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = ['first_name', 'last_name', 'country']
 
-# Team Details
+# Team Details Serializer
         
 class TeamSerializer(serializers.ModelSerializer):
     players = PlayerSerializer(many=True, read_only=True)
@@ -84,14 +71,14 @@ class TeamSerializer(serializers.ModelSerializer):
         model = Team
         fields = ['name', 'country', 'budget', 'team_value', 'final_value', 'players']
 
-# Team Update
+# Team Update Serializer
         
 class TeamUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = ['name', 'country']
 
-# User Details View
+# User Details View Serializer
 
 class UserDetailSerializer(serializers.ModelSerializer):
     team = TeamSerializer(read_only=True)
@@ -101,7 +88,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
         fields = ['username', 'name', 'team']
    
 
-# Transfer List Create
+# Transfer List Create Serializer
 
 class TransferListSerializer(serializers.ModelSerializer):
     player = serializers.PrimaryKeyRelatedField(queryset=Player.objects.none())
@@ -109,37 +96,40 @@ class TransferListSerializer(serializers.ModelSerializer):
     class Meta:
         model = TransferList
         fields = ['player', 'asking_price']
-
+    # try to remove this init  but get same functionality. make helper function
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if 'context' in kwargs and 'players' in kwargs['context']:
             self.fields['player'].queryset = kwargs['context']['players']
 
-    # Customization for showing full name of player
-        
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data['player'] = instance.player.first_name + ' ' + instance.player.last_name
-        return data
+    """
+    Calling helper function to show the player full name 
+    instead of ID, when a user list player to Transfer List
+    for selling from the URL
+    """
 
+    def to_representation(self, instance):
+        return transfer_list_name_instead_of_id(instance)
 
 # Market List
 
 class MarketListSerializer(serializers.ModelSerializer):
     player_name = serializers.SerializerMethodField()
-    player_country = serializers.CharField(source='transfer_list.player.country')
+    player_country = serializers.SerializerMethodField()
     team_name = serializers.SerializerMethodField()
-    asking_price = serializers.DecimalField(source='transfer_list.asking_price', max_digits=10, decimal_places=2)
+    asking_price = serializers.SerializerMethodField()
 
     class Meta:
         model = MarketList
         fields = ['player_name', 'player_country', 'team_name', 'asking_price']
+    
+    """
+    Calling helper function to show player details when 
+    user visits the Market List from URL
+    """
 
-    def get_player_name(self, obj):
-        return f'{obj.transfer_list.player.first_name} {obj.transfer_list.player.last_name}'
-        
-    def get_team_name(self, obj):
-        return obj.transfer_list.player.team_set.first().name if obj.transfer_list.player.team_set.exists() else None
+    def to_representation(self, instance):
+        return market_list_serializer_helper(instance)
 
 # Player Buy
     

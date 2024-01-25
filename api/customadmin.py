@@ -1,38 +1,27 @@
 from django.contrib import admin
 from .models import *
-from faker import Faker
-import random
+from .helper_functions import *
 
-"""Customization of the admin panel"""
+
+""" ***~~~ Customization of the admin panel ~~~*** """
 
 # Customize User admin page
 
-fake = Faker()
 class CustomUserAdmin(admin.ModelAdmin):
     list_display = ('username', 'name', 'email')
     search_fields = ("username",)
 
-    # To automatically generate players data when admin add a new user from admin panel
-     
     def save_model(self, request, obj, form, change):
         if not change or not obj.pk:
             obj.set_password(obj.password)
             obj.save()
             if obj.team_name and obj.team_country:
-                team = Team.objects.create(owner=obj, name=obj.team_name, country=obj.team_country)
-
-                positions = ['Goalkeeper']*3 + ['Defender']*6 + ['Midfielder']*6 + ['Attacker']*5
-                for position in positions:
-                    player = Player.objects.create( 
-                        first_name=fake.first_name(),
-                        last_name=fake.last_name(),
-                        country=random.choice(COUNTRIES),
-                        age=random.randint(18, 40),
-                        position=position
-                    )
-                    team.players.add(player)
-
-                team.save()
+                """
+                Calling helper function so system can automatically
+                create player data when admin creates a new player from 
+                admin panel
+                """
+                user_register_create_team_and_players(obj, obj.team_name, obj.team_country)
         else:
             if obj.pk:
                 orig_obj = CustomUser.objects.get(pk=obj.pk)
