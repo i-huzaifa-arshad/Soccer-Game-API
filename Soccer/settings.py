@@ -38,9 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    # 'api', # Commented because duplicate (api.apps.ApiConfig) is added
     'rest_framework.authtoken',
-    'api.apps.ApiConfig' # Added to access the signals.py, so no need to write 'api'
+    
+    """Added to access the signals.py file"""
+    'api.apps.ApiConfig' 
 ]
 
 MIDDLEWARE = [
