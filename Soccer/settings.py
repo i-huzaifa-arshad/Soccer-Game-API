@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     
-    """Added to access the signals.py file"""
+    # Added to access the signals.py file
     'api.apps.ApiConfig' 
 ]
 
