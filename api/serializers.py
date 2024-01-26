@@ -132,8 +132,3 @@ class MarketListSerializer(serializers.ModelSerializer):
         return market_list_serializer_helper(instance)
 
 # Player Buy
-    
-class PlayerBuySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PlayerBuy
-        fields = ['buyer', 'player', 'buying_price']

@@ -121,9 +121,6 @@ class MarketList(models.Model):
 
 # Player Buy
         
-class PlayerBuy(models.Model):
-    buyer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    player = models.ForeignKey(Player, on_delete=models.CASCADE)
-    buying_price = models.DecimalField(max_digits=10, decimal_places=2)
-
-
+# class BuyPlayer(models.Model):
+#     player = models.OneToOneField(TransferList, on_delete=models.CASCADE)
+#     price = models.DecimalField(max_digits=10, decimal_places=2)
