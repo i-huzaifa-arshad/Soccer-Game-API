@@ -132,3 +132,34 @@ class MarketListSerializer(serializers.ModelSerializer):
         return market_list_serializer_helper(instance)
 
 # Player Buy
+
+class BuyPlayerSerializer(serializers.Serializer):
+    player = serializers.PrimaryKeyRelatedField(queryset=Player.objects.none())
+    price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    
+    def get_player_queryset(self):
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            username = request.user.username
+            user = CustomUser.objects.get(username=username)
+            try:
+                user_team = Team.objects.get(owner=user)
+                return Player.objects.filter(listing_status='Listed').exclude(team__owner=user).exclude(team=user_team)
+            except Team.DoesNotExist:
+                return Player.objects.filter(listing_status='Listed').exclude(team__owner=user)
+        return Player.objects.none()
+
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['player'].queryset = self.get_player_queryset()
+
+
+"""
+The current code works. The only issue is it also showing the 
+current logged in user team players in Player field. It need to
+be fixed. 
+
+Also, from admin panel, the admin can add player but it can't assign
+team name to it. Add this functionality.
+"""

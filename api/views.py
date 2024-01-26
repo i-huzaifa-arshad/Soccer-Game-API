@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from django.db import IntegrityError
 from rest_framework import filters
 from rest_framework.authtoken.models import Token
+from random import randint
+from decimal import Decimal
 from .models import *
 from .serializers import *
 
@@ -262,3 +264,56 @@ class MarketListView(generics.ListAPIView):
 
 
 # Player Buy View
+
+
+class BuyPlayerView(generics.CreateAPIView):
+    serializer_class = BuyPlayerSerializer
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return self.serializer_class(*args, **kwargs)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        return context
+
+    def authenticate_user(self):
+        user = CustomUser.objects.get(username=self.kwargs['username'])
+        token = Token.objects.filter(user=user)
+        if token.exists():
+            return True
+        else:
+            return False
+
+    def post(self, request, *args, **kwargs):
+        if not self.authenticate_user():
+            username = self.kwargs['username']
+            return Response({'message': f'User *{username}* not logged in. Please login first to buy a player.'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        player = serializer.validated_data['player']
+        buyer_team = Team.objects.get(owner__username=self.kwargs['username'])
+        seller_team = player.team_set.first()
+
+        # Update team budgets
+        buyer_team.budget -= serializer.validated_data['price']
+        seller_team.budget += serializer.validated_data['price']
+
+        # Increase player value by a random percentage between 10 and 100
+        increase_percentage = Decimal(randint(10, 100)) / 100
+        player.market_value *= (1 + increase_percentage)
+
+        # Update teams and player
+        buyer_team.players.add(player)
+        seller_team.players.remove(player)
+        player.listing_status = 'Not Listed'
+        player.save()
+        buyer_team.save()
+        seller_team.save()
+
+        # Remove player from TransferList and MarketList
+        TransferList.objects.filter(player=player).delete()
+        MarketList.objects.filter(transfer_list__player=player).delete()
+
+        return Response({'message': f'Congratulations {self.kwargs["username"]}, you successfully bought {player.first_name} {player.last_name}.'}, status=status.HTTP_201_CREATED)

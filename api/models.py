@@ -118,9 +118,3 @@ class MarketList(models.Model):
         self.transfer_list.player.listing_status = 'Listed'
         self.transfer_list.player.save()
         super().save(*args, **kwargs)
-
-# Player Buy
-        
-# class BuyPlayer(models.Model):
-#     player = models.OneToOneField(TransferList, on_delete=models.CASCADE)
-#     price = models.DecimalField(max_digits=10, decimal_places=2)
