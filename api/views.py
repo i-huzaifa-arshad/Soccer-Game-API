@@ -265,7 +265,6 @@ class MarketListView(generics.ListAPIView):
 
 # Player Buy View
 
-
 class BuyPlayerView(generics.CreateAPIView):
     serializer_class = BuyPlayerSerializer
 
@@ -277,7 +276,11 @@ class BuyPlayerView(generics.CreateAPIView):
         context = super().get_serializer_context()
         context.update({"request": self.request})
         return context
-
+    
+    ''' Check if user is logged in or not. If logged in,
+        proceed. Else, ask user to login first.
+    '''
+    
     def authenticate_user(self):
         user = CustomUser.objects.get(username=self.kwargs['username'])
         token = Token.objects.filter(user=user)
@@ -295,6 +298,15 @@ class BuyPlayerView(generics.CreateAPIView):
         player = serializer.validated_data['player']
         buyer_team = Team.objects.get(owner__username=self.kwargs['username'])
         seller_team = player.team_set.first()
+
+        # Get the asking price from the TransferList
+        asking_price = TransferList.objects.get(player=player).asking_price
+
+        # Check if the price provided by the user matches the asking price
+        if serializer.validated_data['price'] < asking_price:
+            return Response({'Warning': 'Price must be equal. The current price is less than asking price.'}, status=status.HTTP_400_BAD_REQUEST)
+        elif serializer.validated_data['price'] > asking_price:
+            return Response({'Warning': 'Price must be equal. The current price is more than asking price.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Update team budgets
         buyer_team.budget -= serializer.validated_data['price']
@@ -316,4 +328,4 @@ class BuyPlayerView(generics.CreateAPIView):
         TransferList.objects.filter(player=player).delete()
         MarketList.objects.filter(transfer_list__player=player).delete()
 
-        return Response({'message': f'Congratulations {self.kwargs["username"]}, you successfully bought {player.first_name} {player.last_name}.'}, status=status.HTTP_201_CREATED)
+        return Response({'message': f'Congratulations *{self.kwargs["username"]}*, you successfully bought *{player.first_name} {player.last_name}*.'}, status=status.HTTP_201_CREATED)

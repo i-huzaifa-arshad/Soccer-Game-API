@@ -96,7 +96,7 @@ class TransferListSerializer(serializers.ModelSerializer):
     class Meta:
         model = TransferList
         fields = ['player', 'asking_price']
-    # try to remove this init  but get same functionality. make helper function
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if 'context' in kwargs and 'players' in kwargs['context']:
@@ -136,18 +136,12 @@ class MarketListSerializer(serializers.ModelSerializer):
 class BuyPlayerSerializer(serializers.Serializer):
     player = serializers.PrimaryKeyRelatedField(queryset=Player.objects.none())
     price = serializers.DecimalField(max_digits=10, decimal_places=2)
-    
+
     def get_player_queryset(self):
-        request = self.context.get('request')
-        if request and hasattr(request, 'user'):
-            username = request.user.username
-            user = CustomUser.objects.get(username=username)
-            try:
-                user_team = Team.objects.get(owner=user)
-                return Player.objects.filter(listing_status='Listed').exclude(team__owner=user).exclude(team=user_team)
-            except Team.DoesNotExist:
-                return Player.objects.filter(listing_status='Listed').exclude(team__owner=user)
-        return Player.objects.none()
+        username = self.context.get('view').kwargs['username']
+        user = CustomUser.objects.get(username=username)
+        user_team = Team.objects.get(owner=user)
+        return Player.objects.filter(listing_status='Listed').exclude(team=user_team)
 
 
     def __init__(self, *args, **kwargs):
@@ -156,10 +150,6 @@ class BuyPlayerSerializer(serializers.Serializer):
 
 
 """
-The current code works. The only issue is it also showing the 
-current logged in user team players in Player field. It need to
-be fixed. 
-
 Also, from admin panel, the admin can add player but it can't assign
 team name to it. Add this functionality.
 """
