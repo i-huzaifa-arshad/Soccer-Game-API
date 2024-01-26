@@ -4,8 +4,6 @@ from rest_framework.response import Response
 from django.db import IntegrityError
 from rest_framework import filters
 from rest_framework.authtoken.models import Token
-from random import randint
-from decimal import Decimal
 from .models import *
 from .serializers import *
 
@@ -295,37 +293,8 @@ class BuyPlayerView(generics.CreateAPIView):
             return Response({'message': f'User *{username}* not logged in. Please login first to buy a player.'}, status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        player = serializer.validated_data['player']
-        buyer_team = Team.objects.get(owner__username=self.kwargs['username'])
-        seller_team = player.team_set.first()
-
-        # Get the asking price from the TransferList
-        asking_price = TransferList.objects.get(player=player).asking_price
-
-        # Check if the price provided by the user matches the asking price
-        if serializer.validated_data['price'] < asking_price:
-            return Response({'Warning': 'Price must be equal. The current price is less than asking price.'}, status=status.HTTP_400_BAD_REQUEST)
-        elif serializer.validated_data['price'] > asking_price:
-            return Response({'Warning': 'Price must be equal. The current price is more than asking price.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Update team budgets
-        buyer_team.budget -= serializer.validated_data['price']
-        seller_team.budget += serializer.validated_data['price']
-
-        # Increase player value by a random percentage between 10 and 100
-        increase_percentage = Decimal(randint(10, 100)) / 100
-        player.market_value *= (1 + increase_percentage)
-
-        # Update teams and player
-        buyer_team.players.add(player)
-        seller_team.players.remove(player)
-        player.listing_status = 'Not Listed'
-        player.save()
-        buyer_team.save()
-        seller_team.save()
-
-        # Remove player from TransferList and MarketList
-        TransferList.objects.filter(player=player).delete()
-        MarketList.objects.filter(transfer_list__player=player).delete()
-
-        return Response({'message': f'Congratulations *{self.kwargs["username"]}*, you successfully bought *{player.first_name} {player.last_name}*.'}, status=status.HTTP_201_CREATED)
+        result, message = buy_player(serializer, self.kwargs['username'])
+        if result == 'Warning':
+            return Response({'Warning': message}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'message': message}, status=status.HTTP_201_CREATED)

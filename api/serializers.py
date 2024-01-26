@@ -143,13 +143,7 @@ class BuyPlayerSerializer(serializers.Serializer):
         user_team = Team.objects.get(owner=user)
         return Player.objects.filter(listing_status='Listed').exclude(team=user_team)
 
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['player'].queryset = self.get_player_queryset()
 
-
-"""
-Also, from admin panel, the admin can add player but it can't assign
-team name to it. Add this functionality.
-"""
