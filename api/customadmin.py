@@ -99,6 +99,29 @@ class TransferListAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
         MarketList.objects.create(transfer_list=obj)
 
+    '''
+    To delete single player from transfer list and change 
+    its listing status from "Listed" to "Not Listed"
+    '''
+
+    def delete_model(self, request, obj):
+        player = obj.player
+        player.listing_status = 'Not Listed'
+        player.save()
+        super().delete_model(request, obj)
+
+    '''
+    To delete multiple players from transfer list at once
+    and change their listing status from "Listed" to "Not Listed"
+    '''
+
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            player = obj.player
+            player.listing_status = 'Not Listed'
+            player.save()
+        super().delete_queryset(request, queryset)
+
     list_display = ('player_name', 'team_name', 'position', 'country', 'price')
     list_filter = ('player__team__name',)
 

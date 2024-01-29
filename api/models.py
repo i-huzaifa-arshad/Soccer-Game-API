@@ -43,19 +43,11 @@ class Team(models.Model):
     budget = models.DecimalField(max_digits=10, decimal_places=2, default=5000000)
     owner = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='team')
     """Instead of using @property, make them as model fields"""
-    team_value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    team_value = models.DecimalField(max_digits=10, decimal_places=2, default=0) 
     final_value = models.DecimalField(max_digits=10, decimal_places=2, default=0) 
 
     def __str__(self):
         return self.name
-
-    # @property
-    # def team_value(self):
-    #     return sum(player.market_value for player in self.players.all())
-
-    # @property
-    # def final_value(self):
-    #     return self.team_value + self.budget
 
 # Create Player Model
     
@@ -100,8 +92,6 @@ class TransferList(models.Model):
         self.player.save()
         super().save(*args, **kwargs)
     
-    
-
 # Market List
 
 class MarketList(models.Model):
@@ -113,3 +103,10 @@ class MarketList(models.Model):
         self.transfer_list.player.save()
         super().save(*args, **kwargs)
 
+"""
+Currently, when a user or admin list player for transfer,
+it works. However, when admin deletes the user from transfer
+list, it gets deleted from transfer and market list from admin
+and api, however, the listing status is not changed from Player
+admin or user_details. So, check this....
+"""

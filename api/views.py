@@ -1,8 +1,7 @@
 from django.contrib.auth import authenticate
-from rest_framework import generics, status
+from rest_framework import generics, status, filters
 from rest_framework.response import Response
 from django.db import IntegrityError
-from rest_framework import filters
 from rest_framework.authtoken.models import Token
 from .models import *
 from .serializers import *
@@ -257,7 +256,8 @@ class TransferListView(generics.ListCreateAPIView):
 class MarketListView(generics.ListAPIView):
     serializer_class = MarketListSerializer
     filter_backends = [filters.SearchFilter]
-    search_fields = ['transfer_list__player__first_name', 'transfer_list__player__last_name', 
+    search_fields = [
+                     'transfer_list__player__first_name', 'transfer_list__player__last_name', 
                      'transfer_list__player__country', 'transfer_list__player__team__name', 
                      'transfer_list__asking_price'
                     ]
@@ -296,8 +296,5 @@ class BuyPlayerView(generics.CreateAPIView):
                 status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        result, message = buy_player(serializer, self.kwargs['username'])
-        if result == 'Warning':
-            return Response({'Warning': message}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'message': message}, status=status.HTTP_201_CREATED)
+        response = buy_player(serializer, self.kwargs['username'])
+        return response

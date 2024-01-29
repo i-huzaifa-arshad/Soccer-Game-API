@@ -3,6 +3,8 @@ import random
 from faker import Faker
 from random import randint
 from decimal import Decimal
+from rest_framework import status
+from rest_framework.response import Response
 from django.contrib.admin import SimpleListFilter
 
 
@@ -27,8 +29,10 @@ def user_register_create_team_and_players(user, team_name, team_country):
             team=team 
         )
         team.players.add(player)
-        team.team_value += player.market_value # Calculating team value (combined player market value)
-    team.final_value = team.team_value + team.budget # Calculating team final value (team_value + team_budget)
+        # Calculating team_value (combined player market value) 
+        team.team_value += player.market_value 
+    # Calculating team final_value (team_value + team_budget) 
+    team.final_value = team.team_value + team.budget 
     team.save()    
 
 """
@@ -71,9 +75,16 @@ def buy_player(serializer, username):
 
     # Check if the price provided by the user matches the asking price
     if serializer.validated_data['price'] < asking_price:
-        return ('Warning', 'Price must be equal. The current price is less than asking price.')
+        return Response({
+            'status': 'Warning', 
+            'message': 'The current price is *less* than asking price.'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
     elif serializer.validated_data['price'] > asking_price:
-        return ('Warning', 'Price must be equal. The current price is more than asking price.')
+        return Response({
+            'status': 'Warning', 
+            'message': 'The current price is *more* than asking price.'
+        }, status=status.HTTP_400_BAD_REQUEST)
 
     # Update team budgets
     buyer_team.budget -= serializer.validated_data['price']
@@ -88,21 +99,24 @@ def buy_player(serializer, username):
     player.listing_status = 'Not Listed'
     player.save()
 
-    # Update the Buyer team_value and final_value # try
-    buyer_team.team_value += player.market_value # try
-    buyer_team.final_value = buyer_team.team_value + buyer_team.budget # try
+    # Update the Buyer team_value and final_value 
+    buyer_team.team_value += player.market_value
+    buyer_team.final_value = buyer_team.team_value + buyer_team.budget
     buyer_team.save()
 
-    # Update the Seller team_value and final_value # try
-    seller_team.team_value -= player.market_value # try
-    seller_team.final_value = seller_team.team_value + seller_team.budget # try
+    # Update the Seller team_value and final_value
+    seller_team.team_value -= player.market_value
+    seller_team.final_value = seller_team.team_value + seller_team.budget
     seller_team.save()
 
     # Remove player from TransferList and MarketList
     TransferList.objects.filter(player=player).delete()
     MarketList.objects.filter(transfer_list__player=player).delete()
 
-    return ('Success', f'Congratulations *{username}*, you successfully bought *{player.first_name} {player.last_name}*.')
+    return Response({
+        'status': 'Success', 
+        'message': f'Congratulations *{username}*, you successfully bought *{player.first_name} {player.last_name}*.'
+    }, status=status.HTTP_200_OK)
 
 
 """
