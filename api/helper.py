@@ -27,6 +27,8 @@ def user_register_create_team_and_players(user, team_name, team_country):
             team=team 
         )
         team.players.add(player)
+        team.team_value += player.market_value # Calculating team value (combined player market value)
+    team.final_value = team.team_value + team.budget # Calculating team final value (team_value + team_budget)
     team.save()    
 
 """
@@ -85,7 +87,15 @@ def buy_player(serializer, username):
     player.team = buyer_team  # Set the player's team to the buyer team
     player.listing_status = 'Not Listed'
     player.save()
+
+    # Update the Buyer team_value and final_value # try
+    buyer_team.team_value += player.market_value # try
+    buyer_team.final_value = buyer_team.team_value + buyer_team.budget # try
     buyer_team.save()
+
+    # Update the Seller team_value and final_value # try
+    seller_team.team_value -= player.market_value # try
+    seller_team.final_value = seller_team.team_value + seller_team.budget # try
     seller_team.save()
 
     # Remove player from TransferList and MarketList

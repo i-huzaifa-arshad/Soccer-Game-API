@@ -42,17 +42,20 @@ class Team(models.Model):
     country = models.CharField(max_length=70, choices=[(country, country) for country in COUNTRIES])
     budget = models.DecimalField(max_digits=10, decimal_places=2, default=5000000)
     owner = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='team')
+    """Instead of using @property, make them as model fields"""
+    team_value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    final_value = models.DecimalField(max_digits=10, decimal_places=2, default=0) 
 
     def __str__(self):
         return self.name
 
-    @property
-    def team_value(self):
-        return sum(player.market_value for player in self.players.all())
+    # @property
+    # def team_value(self):
+    #     return sum(player.market_value for player in self.players.all())
 
-    @property
-    def final_value(self):
-        return self.team_value + self.budget
+    # @property
+    # def final_value(self):
+    #     return self.team_value + self.budget
 
 # Create Player Model
     
@@ -96,6 +99,8 @@ class TransferList(models.Model):
         self.player.listing_status = 'Listed'
         self.player.save()
         super().save(*args, **kwargs)
+    
+    
 
 # Market List
 
@@ -107,3 +112,4 @@ class MarketList(models.Model):
         self.transfer_list.player.listing_status = 'Listed'
         self.transfer_list.player.save()
         super().save(*args, **kwargs)
+
