@@ -1,17 +1,22 @@
 from rest_framework import serializers
 from .models import *
-from .helper_functions import *
+from .helper import *
 
 # User Register Serializer
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     team_name = serializers.CharField(write_only=True)
-    team_country = serializers.ChoiceField(choices=[(country.name, country.name) for country in pycountry.countries], write_only=True)
+    team_country = serializers.ChoiceField(choices=[(country.name, country.name) 
+                                                    for country in pycountry.countries], 
+                                                    write_only=True)
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'name', 'email', 'password', 'team_name', 'team_country'] 
+        fields = ['username', 'name', 
+                  'email', 'password', 
+                  'team_name', 'team_country'
+                ] 
 
     def create(self, validated_data):
         team_name = validated_data.pop('team_name')
@@ -19,10 +24,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         user = super().create(validated_data)
         user.set_password(validated_data['password'])
         user.save()
-        """
-        Calling helper function so system can automatically
-        create player data when user signup from the url
-        """
         user_register_create_team_and_players(user, team_name, team_country)
         return user
 
@@ -40,18 +41,21 @@ class UserListSerializer(serializers.ModelSerializer):
         fields = ['username', 'name'] 
 
 # User Update Serializer
-    
+        
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['username', 'name'] 
-        
+        fields = ['username', 'name']
+
 # Player Details Serializer
 
 class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
-        fields = ['id', 'first_name', 'last_name', 'country', 'age', 'market_value', 'position', 'listing_status']
+        fields = ['id', 'first_name', 'last_name', 
+                  'country', 'age', 'market_value', 
+                  'position', 'listing_status'
+                ]
 
 # Player Update Serializer
         
@@ -69,7 +73,10 @@ class TeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = ['name', 'country', 'budget', 'team_value', 'final_value', 'players']
+        fields = ['name', 'country', 
+                  'budget', 'team_value', 
+                  'final_value', 'players'
+                ]
 
 # Team Update Serializer
         
@@ -86,7 +93,6 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['username', 'name', 'team']
-   
 
 # Transfer List Create Serializer
 
@@ -102,14 +108,9 @@ class TransferListSerializer(serializers.ModelSerializer):
         if 'context' in kwargs and 'players' in kwargs['context']:
             self.fields['player'].queryset = kwargs['context']['players']
 
-    """
-    Calling helper function to show the player full name 
-    instead of ID, when a user list player to Transfer List
-    for selling from the URL
-    """
-
     def to_representation(self, instance):
         return transfer_list_name_instead_of_id(instance)
+
 
 # Market List
 
@@ -117,17 +118,13 @@ class MarketListSerializer(serializers.ModelSerializer):
     player_name = serializers.SerializerMethodField()
     player_country = serializers.SerializerMethodField()
     team_name = serializers.SerializerMethodField()
+    position = serializers.SerializerMethodField()
     asking_price = serializers.SerializerMethodField()
 
     class Meta:
         model = MarketList
-        fields = ['player_name', 'player_country', 'team_name', 'asking_price']
+        fields = ['player_name', 'player_country', 'team_name', 'position', 'asking_price']
     
-    """
-    Calling helper function to show player details when 
-    user visits the Market List from URL
-    """
-
     def to_representation(self, instance):
         return market_list_serializer_helper(instance)
 

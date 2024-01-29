@@ -3,6 +3,8 @@ import random
 from faker import Faker
 from random import randint
 from decimal import Decimal
+from django.contrib.admin import SimpleListFilter
+
 
 """ 
 Helper function for system to generate player data
@@ -21,10 +23,11 @@ def user_register_create_team_and_players(user, team_name, team_country):
             last_name=fake.last_name(),
             country=random.choice(COUNTRIES),
             age=random.randint(18, 40),
-            position=position
+            position=position,
+            team=team 
         )
         team.players.add(player)
-    team.save()
+    team.save()    
 
 """
 Helper function to show full name of players when a user
@@ -46,18 +49,20 @@ def market_list_serializer_helper(obj):
     data = {}
     data['player_name'] = f'{obj.transfer_list.player.first_name} {obj.transfer_list.player.last_name}'
     data['player_country'] = obj.transfer_list.player.country
-    data['team_name'] = obj.transfer_list.player.team_set.first().name if obj.transfer_list.player.team_set.exists() else None
+    data['team_name'] = obj.transfer_list.player.team.name
+    data['position'] = obj.transfer_list.player.position
     data['asking_price'] = f"$ {obj.transfer_list.asking_price}"
     return data
 
+
 """
-Helper function for Buy Player View
+Helper function for Buy Player View Calculations
 """
 
 def buy_player(serializer, username):
     player = serializer.validated_data['player']
     buyer_team = Team.objects.get(owner__username=username)
-    seller_team = player.team_set.first()
+    seller_team = player.team  
 
     # Get the asking price from the TransferList
     asking_price = TransferList.objects.get(player=player).asking_price
@@ -77,8 +82,7 @@ def buy_player(serializer, username):
     player.market_value *= (1 + increase_percentage)
 
     # Update teams and player
-    buyer_team.players.add(player)
-    seller_team.players.remove(player)
+    player.team = buyer_team  # Set the player's team to the buyer team
     player.listing_status = 'Not Listed'
     player.save()
     buyer_team.save()
@@ -89,3 +93,21 @@ def buy_player(serializer, username):
     MarketList.objects.filter(transfer_list__player=player).delete()
 
     return ('Success', f'Congratulations *{username}*, you successfully bought *{player.first_name} {player.last_name}*.')
+
+
+"""
+Helper Class for Market List Admin
+Country Filter
+"""
+
+class CountryFilter(SimpleListFilter):
+    title = 'country'  
+    parameter_name = 'country'  
+
+    def lookups(self, request, model_admin):
+        countries = set([cn.transfer_list.player.country for cn in model_admin.model.objects.all()])
+        return [(cn, cn) for cn in countries]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(transfer_list__player__country=self.value())
