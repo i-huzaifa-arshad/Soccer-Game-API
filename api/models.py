@@ -102,11 +102,3 @@ class MarketList(models.Model):
         self.transfer_list.player.listing_status = 'Listed'
         self.transfer_list.player.save()
         super().save(*args, **kwargs)
-
-"""
-Currently, when a user or admin list player for transfer,
-it works. However, when admin deletes the user from transfer
-list, it gets deleted from transfer and market list from admin
-and api, however, the listing status is not changed from Player
-admin or user_details. So, check this....
-"""
