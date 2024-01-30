@@ -111,7 +111,6 @@ class TransferListSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         return transfer_list_name_instead_of_id(instance)
 
-
 # Market List
 
 class MarketListSerializer(serializers.ModelSerializer):
