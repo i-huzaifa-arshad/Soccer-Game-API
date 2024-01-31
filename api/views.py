@@ -38,7 +38,7 @@ class UserLoginView(generics.GenericAPIView):
                 team_data = TeamSerializer(team).data
                 return Response({
                     'message': f'Welcome *{user.name}* to the Soccer Online Game Manager Console. Your team details are as follows:',
-                    # 'token': token.key, # Hiding the token for now
+                    'token': token.key,
                     'team': team_data
                 })
         else:
