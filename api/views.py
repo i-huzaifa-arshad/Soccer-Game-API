@@ -38,8 +38,8 @@ class UserLoginView(generics.GenericAPIView):
                 team_data = TeamSerializer(team).data
                 return Response({
                     'message': f'Welcome *{user.name}* to the Soccer Online Game Manager Console. Your team details are as follows:',
+                    'token': token.key,
                     'team': team_data
-                   # 'token': token.key # Hiding the token for now
                 })
         else:
             return Response({
@@ -231,7 +231,7 @@ class TransferListView(generics.ListCreateAPIView):
         kwargs['context'] = self.get_serializer_context()
         kwargs['context'].update({"players": self.get_team().players.all()})
         return self.serializer_class(*args, **kwargs)
-    
+
     def post(self, request, *args, **kwargs):
         if not self.authenticate_user():
             return Response({
