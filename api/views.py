@@ -40,7 +40,6 @@ class UserLoginView(generics.GenericAPIView):
                     'message': f'Welcome *{user.name}* to the Soccer Online Game Manager Console. Your team details are as follows:',
                     'token': token.key,
                     'team': team_data
-                   # 'token': token.key # Hiding the token for now
                 })
         else:
             return Response({
@@ -85,7 +84,7 @@ class UserDetailView(generics.RetrieveAPIView):
 
     def authenticate_user(self, request, *args, **kwargs):
         user = self.get_object()
-        username = user.username
+        username = user.username 
         token = Token.objects.filter(user=user)
         if token.exists():
             return True
@@ -110,7 +109,7 @@ class UserUpdateView(generics.UpdateAPIView):
 
     def authenticate_user(self, request, *args, **kwargs):
         user = self.get_object()
-        username = user.username
+        username = user.username 
         token = Token.objects.filter(user=user)
         if token.exists():
             return True
@@ -134,7 +133,7 @@ class UserDeleteView(generics.DestroyAPIView):
 
     def authenticate_user(self, request, *args, **kwargs):
         user = self.get_object()
-        username = user.username
+        username = user.username 
         token = Token.objects.filter(user=user)
         if token.exists():
             return True
@@ -155,7 +154,7 @@ class UserDeleteView(generics.DestroyAPIView):
             'message': f'User *{username}* deleted successfully! All team data is deleted.'
             }, 
             status=status.HTTP_204_NO_CONTENT)
-
+        
 # Team Update
     
 class TeamUpdateView(generics.UpdateAPIView):

@@ -26,6 +26,8 @@ class CustomUserManager(BaseUserManager):
 
 COUNTRIES = [country.name for country in pycountry.countries]
 
+# Create Custom User Model
+
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=15, null=True) 
     name = models.CharField(max_length=20, null=True)
@@ -42,7 +44,6 @@ class Team(models.Model):
     country = models.CharField(max_length=70, choices=[(country, country) for country in COUNTRIES])
     budget = models.DecimalField(max_digits=10, decimal_places=2, default=5000000)
     owner = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='team')
-    """Instead of using @property, make them as model fields"""
     team_value = models.DecimalField(max_digits=10, decimal_places=2, default=0) 
     final_value = models.DecimalField(max_digits=10, decimal_places=2, default=0) 
 
@@ -75,7 +76,7 @@ class Player(models.Model):
     def __str__(self):
         return self.first_name + " " + self.last_name
     
-# Player Transfer List Create
+# Create Player Transfer List Model
 
 class TransferList(models.Model):
     player = models.OneToOneField(Player, on_delete=models.CASCADE)
@@ -92,7 +93,7 @@ class TransferList(models.Model):
         self.player.save()
         super().save(*args, **kwargs)
     
-# Market List
+# Create Market List Model
 
 class MarketList(models.Model):
     transfer_list = models.OneToOneField(TransferList, on_delete=models.CASCADE)
