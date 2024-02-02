@@ -3,7 +3,6 @@ from drf_yasg.views import get_schema_view
 from collections import OrderedDict
 from drf_yasg import openapi
 
-
 class OrderedSchemaGenerator(OpenAPISchemaGenerator):
     def get_schema(self, request=None, public=False):
         schema = super().get_schema(request, public)
@@ -35,16 +34,13 @@ class OrderedSchemaGenerator(OpenAPISchemaGenerator):
         return schema
 
 schema_view = get_schema_view(
-   openapi.Info(
-      title="Soccer App API",
-      default_version='v1',
-      description=
-                """
-                This is a simple Django REST Framework based api for \
-                Soccer Online Game App where users can create there fantasy \
-                Soccer teams and buy players from other teams.
-                """
-   ),
-   public=True,
-   generator_class=OrderedSchemaGenerator,
+    openapi.Info(
+        title="Soccer App API",
+        default_version='v1',
+        description="""This is a simple Django REST Framework based api for \
+            Soccer Online Game App where users can create their fantasy \
+            Soccer teams and buy players from other teams."""
+    ),
+    public=True,
+    generator_class=OrderedSchemaGenerator
 )

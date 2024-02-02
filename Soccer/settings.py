@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'drf_yasg',
 
     # Custom App
-    'api' 
+    'api'
 ]
 
 MIDDLEWARE = [

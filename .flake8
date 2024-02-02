@@ -9,5 +9,5 @@ exclude =
     .env
     migrations/*
 
-ignore = E226,E302,E41, E305
+ignore = E226, E302, E41, E305, F841
 max-line-length = 160

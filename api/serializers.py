@@ -10,17 +10,17 @@ from .helper import (user_register_create_team_and_players,
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     team_name = serializers.CharField(write_only=True)
-    team_country = serializers.ChoiceField(choices=[(country.name, country.name) 
-                                                    for country in pycountry.countries], 
-                                                    write_only=True)
+    team_country = serializers.ChoiceField(
+        choices=[(country.name, country.name) for country in pycountry.countries],
+        write_only=True
+    )
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'name', 
-                  'email', 'password', 
-                  'team_name', 'team_country'
-                ] 
+        fields = ['username', 'name',
+                  'email', 'password',
+                  'team_name', 'team_country']
 
     def create(self, validated_data):
         team_name = validated_data.pop('team_name')
@@ -32,20 +32,20 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return user
 
 # User Login Serializer
-    
+
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
 # User List Serializer
-    
+
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['username', 'name'] 
+        fields = ['username', 'name']
 
 # User Update Serializer
-        
+
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
@@ -56,19 +56,19 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
-        fields = ['id', 'first_name', 'last_name', 
-                  'country', 'age', 'market_value', 
+        fields = ['id', 'first_name', 'last_name',
+                  'country', 'age', 'market_value',
                   'position', 'listing_status']
 
 # Player Update Serializer
-        
+
 class PlayerUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = ['first_name', 'last_name', 'country']
 
 # Team Details Serializer
-        
+
 class TeamSerializer(serializers.ModelSerializer):
     players = PlayerSerializer(many=True, read_only=True)
     team_value = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
@@ -76,12 +76,12 @@ class TeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = ['name', 'country', 
-                  'budget', 'team_value', 
+        fields = ['name', 'country',
+                  'budget', 'team_value',
                   'final_value', 'players']
 
 # Team Update Serializer
-    
+
 class TeamUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team

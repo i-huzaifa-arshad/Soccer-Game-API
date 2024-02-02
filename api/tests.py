@@ -21,24 +21,24 @@ from django.contrib.auth.hashers import check_password
 """ Sample Test User Data Dictionary"""
 
 test_user = {
-            'email': 'test@example.com',
-            'password': '1122',
-            'username': 'testuser',
-            'name': 'Test User',
-            'team_name': 'Test Team',
-            'team_country': 'Pakistan',
-            'budget': Decimal('5000000.00')
-        }
+    'email': 'test@example.com',
+    'password': '1122',
+    'username': 'testuser',
+    'name': 'Test User',
+    'team_name': 'Test Team',
+    'team_country': 'Pakistan',
+    'budget': Decimal('5000000.00')
+}
 
 test_user_2 = {
-            'email': 'test2@example.com',
-            'password': '1122',
-            'username': 'testuser2',
-            'name': 'Test User 2',
-            'team_name': 'Test Team 2',
-            'team_country': 'Ukraine',
-            'budget': Decimal('5000000.00')
-        }
+    'email': 'test2@example.com',
+    'password': '1122',
+    'username': 'testuser2',
+    'name': 'Test User 2',
+    'team_name': 'Test Team 2',
+    'team_country': 'Ukraine',
+    'budget': Decimal('5000000.00')
+}
 
 """ Countries List for Random Countries """
 
@@ -55,39 +55,39 @@ class BaseClassForUnitTest(APITestCase):
 
         # Creating sample user for test database
         self.user = CustomUser.objects.create_user(
-            email = test_user['email'],
-            password = test_user['password'],
-            username = test_user['username'],
-            name = test_user['name']
+            email=test_user['email'],
+            password=test_user['password'],
+            username=test_user['username'],
+            name=test_user['name']
         )
 
         # Creating 2nd sample user for test database
         self.user2 = CustomUser.objects.create_user(
-            email = test_user_2['email'],
-            password = test_user_2['password'],
-            username = test_user_2['username'],
-            name = test_user_2['name']
+            email=test_user_2['email'],
+            password=test_user_2['password'],
+            username=test_user_2['username'],
+            name=test_user_2['name']
         )
 
         # Creating sample team for test database
         self.team = Team.objects.create(
-            owner = self.user,
-            name = test_user['team_name'],
-            country = test_user['team_country']
+            owner=self.user,
+            name=test_user['team_name'],
+            country=test_user['team_country']
         )
 
         # Creating 2nd sample team for test database
         self.team2 = Team.objects.create(
-            owner = self.user2,
-            name = test_user_2['team_name'],
-            country = test_user_2['team_country']
+            owner=self.user2,
+            name=test_user_2['team_name'],
+            country=test_user_2['team_country']
         )
 
         # Creating 20 sample players for test database for 1st user team
         positions = ['Goalkeeper', 'Defender', 'Midfielder', 'Attacker']
         listing_status = ['Not Listed', 'Listed']
         self.players = [Player.objects.create(
-            id = uuid.uuid4(),
+            id=uuid.uuid4(),
             first_name=fake.first_name(),
             last_name=fake.last_name(),
             country=random.choice(COUNTRIES),
@@ -102,7 +102,7 @@ class BaseClassForUnitTest(APITestCase):
         positions = ['Goalkeeper', 'Defender', 'Midfielder', 'Attacker']
         listing_status = ['Not Listed', 'Listed']
         self.players2 = [Player.objects.create(
-            id = uuid.uuid4(),
+            id=uuid.uuid4(),
             first_name=fake.first_name(),
             last_name=fake.last_name(),
             country=random.choice(COUNTRIES),
@@ -125,19 +125,19 @@ class BaseClassForUnitTest(APITestCase):
 
         # Creating a transfer list instance for 1st user
         self.transfer_list = TransferList.objects.create(
-                                                player=self.players[0], 
-                                                asking_price=Decimal('4500.00')
-                                            )
-        
+            player=self.players[0],
+            asking_price=Decimal('4500.00')
+        )
+
         # Creating a transfer list instance for 2nd user
         self.transfer_list2 = TransferList.objects.create(
-                                                player=self.players2[0], 
-                                                asking_price=Decimal('5500.00')
-                                            )
-        
+            player=self.players2[0],
+            asking_price=Decimal('5500.00')
+        )
+
         # Creating market list instance for 1st user
         self.market_list = MarketList.objects.create(transfer_list=self.transfer_list)
-        
+
         # Creating market list instance for 2nd user
         self.market_list2 = MarketList.objects.create(transfer_list=self.transfer_list2)
 
@@ -149,7 +149,7 @@ class BaseClassForUnitTest(APITestCase):
 
 class CustomUserModelTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test 
+        super().setUp()  # Inheriting from the Base Class For Unit Test
 
     def test_create_user(self):
         self.assertEqual(self.user.email, test_user['email'])
@@ -159,7 +159,7 @@ class CustomUserModelTest(BaseClassForUnitTest):
 
 class TeamModelTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
+        super().setUp()  # Inheriting from the Base Class For Unit Test
 
     def test_team_creation(self):
         self.assertEqual(self.team.name, test_user['team_name'])
@@ -173,8 +173,8 @@ class TeamModelTest(BaseClassForUnitTest):
         team_value = sum(player.market_value for player in self.players)
         final_value = team_value + self.team.budget
 
-        self.assertEqual(team_value, Decimal('20000000.00'))  
-        self.assertEqual(final_value, Decimal('25000000.00'))  
+        self.assertEqual(team_value, Decimal('20000000.00'))
+        self.assertEqual(final_value, Decimal('25000000.00'))
 
 """ Unit Test for Player Model """
 
@@ -200,7 +200,7 @@ class PlayerModelTest(BaseClassForUnitTest):
 class TransferListModelTest(BaseClassForUnitTest):
     def setUp(self):
         super().setUp()  # Inheriting from the Base Class For Unit Test
-        
+
     def test_transfer_list_creation(self):
         self.assertEqual(self.transfer_list.player, self.players[0])
         self.assertEqual(self.transfer_list.asking_price, Decimal('4500.00'))
@@ -211,7 +211,7 @@ class TransferListModelTest(BaseClassForUnitTest):
 class MarketListModelTest(BaseClassForUnitTest):
     def setUp(self):
         super().setUp()  # Inheriting from the Base Class For Unit Test
-    
+
     def test_market_list_creation(self):
         self.assertEqual(self.market_list.transfer_list, self.transfer_list)
         self.assertEqual(self.market_list.transfer_list.player.listing_status, 'Listed')
@@ -260,17 +260,19 @@ class UserRegisterSerializerTest(APITestCase):
             self.assertIn(player.country, COUNTRIES)
 
         # Check if the team value and final value are calculated correctly
-        self.assertEqual(team.team_value, Decimal('20000000.00'))  
-        self.assertEqual(team.final_value, Decimal('25000000.00'))  
+        self.assertEqual(team.team_value, Decimal('20000000.00'))
+        self.assertEqual(team.final_value, Decimal('25000000.00'))
 
 """ Unit Test for User Login Serializer """
 
 class UserLoginSerializerTest(APITestCase):
     def setUp(self):
-        self.serializer = UserLoginSerializer(data={
-            'email': test_user['email'], 
-            'password': test_user['password']
-        })
+        self.serializer = UserLoginSerializer(
+            data={
+                'email': test_user['email'],
+                'password': test_user['password']
+            }
+        )
 
     def test_valid_serializer(self):
         valid = self.serializer.is_valid()
@@ -284,23 +286,26 @@ class UserLoginSerializerTest(APITestCase):
 
 class UserListSerializerTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
+        super().setUp()  # Inheriting from the Base Class For Unit Test
         self.serializer = UserListSerializer(instance=self.user)
-        
+
     def test_user_list_serializer(self):
         data = self.serializer.data
         self.assertCountEqual(data.keys(), ['username', 'name'])
         self.assertEqual(data['username'], test_user['username'])
         self.assertEqual(data['name'], test_user['name'])
-        
+
 """ Unit Test for User Update Serializer """
 
 class UserUpdateSerializerTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
+        super().setUp()  # Inheriting from the Base Class For Unit Test
 
     def test_user_update_serializer(self):
-        data = {'username': 'new_username', 'name': 'New Name'}
+        data = {
+            'username': 'new_username',
+            'name': 'New Name'
+        }
         serializer = UserUpdateSerializer(instance=self.user, data=data)
         self.assertTrue(serializer.is_valid())
         user = serializer.save()
@@ -311,8 +316,8 @@ class UserUpdateSerializerTest(BaseClassForUnitTest):
 
 class PlayerSerializerTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
-    
+        super().setUp()  # Inheriting from the Base Class For Unit Test
+
     def test_player_serializer(self):
         player = self.players[0]
         serializer = PlayerSerializer(instance=player)
@@ -331,11 +336,18 @@ class PlayerSerializerTest(BaseClassForUnitTest):
 
 class PlayerUpdateSerializerTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
-        
+        super().setUp()  # Inheriting from the Base Class For Unit Test
+
     def test_player_update_serializer(self):
-        data = {'first_name': 'New First Name', 'last_name': 'New Last Name', 'country': 'United States'}
-        serializer = PlayerUpdateSerializer(instance=self.players[0], data=data)
+        data = {
+            'first_name': 'New First Name',
+            'last_name': 'New Last Name',
+            'country': 'United States'
+        }
+        serializer = PlayerUpdateSerializer(
+            instance=self.players[0],
+            data=data
+        )
         self.assertTrue(serializer.is_valid())
         player = serializer.save()
         self.assertEqual(player.first_name, data['first_name'])
@@ -346,8 +358,8 @@ class PlayerUpdateSerializerTest(BaseClassForUnitTest):
 
 class TeamSerializerTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
-    
+        super().setUp()  # Inheriting from the Base Class For Unit Test
+
     def test_team_serializer(self):
         team = self.team
         serializer = TeamSerializer(instance=team)
@@ -356,9 +368,9 @@ class TeamSerializerTest(BaseClassForUnitTest):
         # Check serialized data
         self.assertEqual(data['name'], team.name)
         self.assertEqual(data['country'], team.country)
-        self.assertEqual(Decimal(data['budget']), team.budget)  
-        self.assertEqual(Decimal(data['team_value']), team.team_value)  
-        self.assertEqual(Decimal(data['final_value']), team.final_value)  
+        self.assertEqual(Decimal(data['budget']), team.budget)
+        self.assertEqual(Decimal(data['team_value']), team.team_value)
+        self.assertEqual(Decimal(data['final_value']), team.final_value)
 
         # Check the players field
         self.assertEqual(len(data['players']), len(team.players.all()))
@@ -368,7 +380,7 @@ class TeamSerializerTest(BaseClassForUnitTest):
             self.assertEqual(player_data['last_name'], player.last_name)
             self.assertEqual(player_data['country'], player.country)
             self.assertEqual(player_data['age'], player.age)
-            self.assertEqual(player_data['market_value'], str(player.market_value))  
+            self.assertEqual(player_data['market_value'], str(player.market_value))
             self.assertEqual(player_data['position'], player.position)
             self.assertEqual(player_data['listing_status'], player.listing_status)
 
@@ -376,10 +388,13 @@ class TeamSerializerTest(BaseClassForUnitTest):
 
 class TeamUpdateSerializerTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
+        super().setUp()  # Inheriting from the Base Class For Unit Test
 
     def test_team_update_serializer(self):
-        data = {'name': 'New Team Name', 'country': 'Ukraine'}
+        data = {
+            'name': 'New Team Name',
+            'country': 'Ukraine'
+        }
         serializer = TeamUpdateSerializer(instance=self.team, data=data)
         self.assertTrue(serializer.is_valid())
         team = serializer.save()
@@ -390,7 +405,7 @@ class TeamUpdateSerializerTest(BaseClassForUnitTest):
 
 class UserDetailSerializerTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
+        super().setUp()  # Inheriting from the Base Class For Unit Test
 
     def test_user_detail_serializer(self):
         user = self.user
@@ -404,21 +419,24 @@ class UserDetailSerializerTest(BaseClassForUnitTest):
         # Check for Team field
         self.assertEqual(data['team']['name'], user.team.name)
         self.assertEqual(data['team']['country'], user.team.country)
-        self.assertEqual(Decimal(data['team']['budget']), user.team.budget)  
-        self.assertEqual(Decimal(data['team']['team_value']), user.team.team_value) 
+        self.assertEqual(Decimal(data['team']['budget']), user.team.budget)
+        self.assertEqual(Decimal(data['team']['team_value']), user.team.team_value)
         self.assertEqual(Decimal(data['team']['final_value']), user.team.final_value)
 
 """ Unit Test for Transfer List Serializer """
 
 class TransferListSerializerTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
+        super().setUp()  # Inheriting from the Base Class For Unit Test
 
     def test_transfer_list_serializer(self):
         transfer_list = self.transfer_list
-        serializer = TransferListSerializer(instance=transfer_list, context={
-                                            'players': self.players
-                                        })
+        serializer = TransferListSerializer(
+            instance=transfer_list,
+            context={
+                'players': self.players
+            }
+        )
         data = serializer.data
 
         self.assertEqual(data['player'], transfer_list.player.first_name + ' ' + transfer_list.player.last_name)
@@ -428,7 +446,7 @@ class TransferListSerializerTest(BaseClassForUnitTest):
 
 class MarketListSerializerTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
+        super().setUp()  # Inheriting from the Base Class For Unit Test
 
     def test_market_list_serializer(self):
         market_list = self.market_list
@@ -446,13 +464,13 @@ class MarketListSerializerTest(BaseClassForUnitTest):
 
 class BuyPlayerSerializerTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
+        super().setUp()  # Inheriting from the Base Class For Unit Test
 
     def test_buy_player_serializer(self):
         # Create a dictionary with player and price data
         data = {
-            'player': str(self.players2[0].id),  
-            'price': self.transfer_list2.asking_price  
+            'player': str(self.players2[0].id),
+            'price': self.transfer_list2.asking_price
         }
 
         # Add a kwargs attribute to the test case
@@ -473,7 +491,7 @@ class BuyPlayerSerializerTest(BaseClassForUnitTest):
 #############################################################################
 
 """ Test for User Register View """
-    
+
 class UserRegisterViewTest(APITestCase):
     def setUp(self):
         self.url = reverse('user-register')
@@ -503,13 +521,13 @@ class UserRegisterViewTest(APITestCase):
 
 class UserLoginViewTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test 
+        super().setUp()  # Inheriting from the Base Class For Unit Test
         self.url = reverse('user-login')
 
     def test_user_login(self):
         # Sending POST request
         response = self.client.post(self.url, {
-            'email': test_user['email'], 
+            'email': test_user['email'],
             'password': test_user['password']
         }, format='json')
 
@@ -534,10 +552,15 @@ class UserLoginViewTest(BaseClassForUnitTest):
 """ Test for User Logout View """
 
 class UserLogoutViewTest(BaseClassForUnitTest):
-    def setUp(self): 
-        super().setUp() # Inheriting from the Base Class For Unit Test 
+    def setUp(self):
+        super().setUp()  # Inheriting from the Base Class For Unit Test
         self.token = Token.objects.create(user=self.user)
-        self.url = reverse('user-logout', kwargs={'username': self.user.username})
+        self.url = reverse(
+            'user-logout',
+            kwargs={
+                'username': self.user.username
+            }
+        )
 
     def test_user_logout(self):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
@@ -556,7 +579,7 @@ class UserLogoutViewTest(BaseClassForUnitTest):
 
 class UserListViewTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
+        super().setUp()  # Inheriting from the Base Class For Unit Test
         self.url = reverse('user-list')
 
     def test_user_list_view(self):
@@ -568,7 +591,7 @@ class UserListViewTest(BaseClassForUnitTest):
 
         # Checking if response data contains the correct number of users
         self.assertEqual(len(response.data), CustomUser.objects.count())
-        
+
         # Checking if the response data contains correct data
         for data in response.data:
             user = CustomUser.objects.get(username=data['username'])
@@ -579,12 +602,17 @@ class UserListViewTest(BaseClassForUnitTest):
 
 class UserDetailViewTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
-        self.url = reverse('user-detail', kwargs={'username': self.user.username})
+        super().setUp()  # Inheriting from the Base Class For Unit Test
+        self.url = reverse(
+            'user-detail',
+            kwargs={
+                'username': self.user.username
+            }
+        )
         self.token = Token.objects.create(user=self.user)
 
     def test_user_detail_view(self):
-        # Authenticating with token 
+        # Authenticating with token
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         # Sending GET request
@@ -605,7 +633,7 @@ class UserDetailViewTest(BaseClassForUnitTest):
         self.assertEqual(Decimal(team_data['budget']), self.user.team.budget)
         self.assertEqual(Decimal(team_data['team_value']), self.user.team.team_value)
         self.assertEqual(Decimal(team_data['final_value']), self.user.team.final_value)
-        
+
         # Checking if response data contains correct player data
         for player_data in team_data['players']:
             player = Player.objects.get(id=player_data['id'])
@@ -622,8 +650,13 @@ class UserDetailViewTest(BaseClassForUnitTest):
 
 class UserUpdateViewTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
-        self.url = reverse('user-update', kwargs={'username': self.user.username})
+        super().setUp()  # Inheriting from the Base Class For Unit Test
+        self.url = reverse(
+            'user-update',
+            kwargs={
+                'username': self.user.username
+            }
+        )
         self.token = Token.objects.create(user=self.user)
 
     def test_user_update_view(self):
@@ -655,7 +688,7 @@ class UserUpdateViewTest(BaseClassForUnitTest):
 
 class UserDeleteViewTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
+        super().setUp()  # Inheriting from the Base Class For Unit Test
         self.url = reverse('user-delete', kwargs={'username': self.user.username})
         self.token = Token.objects.create(user=self.user)
 
@@ -677,13 +710,18 @@ class UserDeleteViewTest(BaseClassForUnitTest):
 
 class TeamUpdateViewTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
-        self.url = reverse('team-update', kwargs={'owner__username': self.user.username})
+        super().setUp()  # Inheriting from the Base Class For Unit Test
+        self.url = reverse(
+            'team-update',
+            kwargs={
+                'owner__username': self.user.username
+            }
+        )
         self.token = Token.objects.create(user=self.user)
 
     def test_team_update_view(self):
         # Authenticating with token
-        self.client.credentials(HTTP_AUTHORIZATION='Token '+ self.token.key)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         # print(f"Before update | Team name = {self.user.team.name}, Team country = {self.user.team.country}")
 
         new_team_name = 'New Team Name'
@@ -692,7 +730,7 @@ class TeamUpdateViewTest(BaseClassForUnitTest):
         response = self.client.put(self.url, {
             'name': new_team_name,
             'country': new_team_country
-        }, format = 'json')
+        }, format='json')
 
         # Checking if response is valid
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -708,17 +746,20 @@ class TeamUpdateViewTest(BaseClassForUnitTest):
 
 class PlayerUpdateViewTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
-        self.player = self.user.team.players.first() # Taking the first player of the team
-        self.url = reverse('player-update', kwargs={
-                                                   'teamname': self.user.team.name,
-                                                   'id': self.player.id
-                                                }) 
+        super().setUp()  # Inheriting from the Base Class For Unit Test
+        self.player = self.user.team.players.first()  # Taking the first player of the team
+        self.url = reverse(
+            'player-update',
+            kwargs={
+                'teamname': self.user.team.name,
+                'id': self.player.id
+            }
+        )
         self.token = Token.objects.create(user=self.user)
-    
+
     def test_player_update_view(self):
         # Authenticating with token
-        self.client.credentials(HTTP_AUTHORIZATION='Token '+ self.token.key)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         # print(f"Before update:")
         # print(f"Player First name = {self.player.first_name}")
         # print(f"Player Last Name = {self.player.last_name}")
@@ -733,7 +774,7 @@ class PlayerUpdateViewTest(BaseClassForUnitTest):
             'first_name': player_new_first_name,
             'last_name': player_new_last_name,
             'country': player_new_country_name
-        }, format = 'json')
+        }, format='json')
 
         # Checking if the response is valid
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -748,23 +789,28 @@ class PlayerUpdateViewTest(BaseClassForUnitTest):
         # print(f"Player First name = {self.player.first_name}")
         # print(f"Player Last Name = {self.player.last_name}")
         # print(f"Player country = {self.player.country}")
-                                                   
+
 """ Unit Test for Transfer List View """
 
 class TransferListViewTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
-        self.url = reverse('transfer-list', kwargs={'username': self.user.username})
+        super().setUp()  # Inheriting from the Base Class For Unit Test
+        self.url = reverse(
+            'transfer-list',
+            kwargs={
+                'username': self.user.username
+            }
+        )
         self.token = Token.objects.create(user=self.user)
-        self.player = self.user.team.players.first() # Taking first player of the team 
+        self.player = self.user.team.players.first()  # Taking first player of the team
 
     def test_transfer_list_view(self):
         # Authenticating with token
-        self.client.credentials(HTTP_AUTHORIZATION='Token '+ self.token.key)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         # Get the TransferList objects for the current user
-        user_transfer_list = TransferList.objects.filter(player__team__owner=self.user)
-        
+        # user_transfer_list = TransferList.objects.filter(player__team__owner=self.user)
+
         # print("Transfer List Before POST Request:")
         # for transfer_list in user_transfer_list:
         #     print(f"Player: {transfer_list.player.first_name} {transfer_list.player.last_name}")
@@ -776,13 +822,13 @@ class TransferListViewTest(BaseClassForUnitTest):
         response = self.client.post(self.url, {
             'player': self.player.id,
             'asking_price': '125000.00'
-        }, format = 'json')
+        }, format='json')
 
         # Checking if response is valid
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # Refresh the Transfer List to see the newly added players
-        user_transfer_list = TransferList.objects.filter(player__team__owner=self.user).all()
+        # user_transfer_list = TransferList.objects.filter(player__team__owner=self.user).all()
 
         # print("Transfer List After POST Request:")
         # for transfer_list in user_transfer_list:
@@ -801,7 +847,7 @@ class TransferListViewTest(BaseClassForUnitTest):
 
 class MarketListViewTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
+        super().setUp()  # Inheriting from the Base Class For Unit Test
         self.url = reverse('market-list')
 
     def test_market_list_view(self):
@@ -826,10 +872,15 @@ class MarketListViewTest(BaseClassForUnitTest):
 
 class BuyPlayerViewTest(BaseClassForUnitTest):
     def setUp(self):
-        super().setUp() # Inheriting from the Base Class For Unit Test
-        self.url = reverse('buy-player', kwargs={'username': self.user.username})
+        super().setUp()  # Inheriting from the Base Class For Unit Test
+        self.url = reverse(
+            'buy-player',
+            kwargs={
+                'username': self.user.username
+            }
+        )
         self.token = Token.objects.create(user=self.user)
-        self.player = self.players2[0] # Taking first player of another team 
+        self.player = self.players2[0]  # Taking first player of another team
 
         self.asking_price = self.transfer_list2.asking_price
         self.buyer_initial_budget = self.user.team.budget
@@ -839,7 +890,7 @@ class BuyPlayerViewTest(BaseClassForUnitTest):
 
     def test_buy_player_view(self):
         # Authenticating with token
-        self.client.credentials(HTTP_AUTHORIZATION='Token '+ self.token.key)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         # Print the before details
         # print("Before buying player:")
@@ -858,7 +909,7 @@ class BuyPlayerViewTest(BaseClassForUnitTest):
         response = self.client.post(self.url, {
             'player': self.player.id,
             'price': str(self.asking_price)
-        }, format = 'json')
+        }, format='json')
 
         # Checking if response is valid
         self.assertEqual(response.status_code, status.HTTP_200_OK)
