@@ -6,7 +6,7 @@ exclude =
     *.py[co],
     __pycache__,
     venv,
-    .env
+    .env,
     migrations/*
 
 ignore = E226, E302, E41, E305, F841
