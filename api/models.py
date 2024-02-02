@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager, 
+                                        PermissionsMixin)
 import pycountry
 import uuid
 
@@ -29,29 +30,29 @@ COUNTRIES = [country.name for country in pycountry.countries]
 # Create Custom User Model
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=15, null=True) 
+    username = models.CharField(max_length=15, null=True)
     name = models.CharField(max_length=20, null=True)
     email = models.EmailField(verbose_name="email address", unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     objects = CustomUserManager()
-    USERNAME_FIELD = 'email' 
+    USERNAME_FIELD = 'email'
 
 # Create Team model
-    
+
 class Team(models.Model):
     name = models.CharField(max_length=100)
     country = models.CharField(max_length=70, choices=[(country, country) for country in COUNTRIES])
     budget = models.DecimalField(max_digits=10, decimal_places=2, default=5000000)
     owner = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='team')
-    team_value = models.DecimalField(max_digits=10, decimal_places=2, default=0) 
-    final_value = models.DecimalField(max_digits=10, decimal_places=2, default=0) 
+    team_value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    final_value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):
         return self.name
 
 # Create Player Model
-    
+
 class Player(models.Model):
     POSITIONS = [
         ('Goalkeeper', 'Goalkeeper'),
@@ -71,11 +72,11 @@ class Player(models.Model):
     market_value = models.DecimalField(max_digits=10, decimal_places=2, default=1000000)
     position = models.CharField(max_length=20, choices=POSITIONS)
     listing_status = models.CharField(max_length=20, choices=LISTING_STATUS_CHOICES, default='Not Listed')
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='players') 
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='players')
 
     def __str__(self):
         return self.first_name + " " + self.last_name
-    
+
 # Create Player Transfer List Model
 
 class TransferList(models.Model):
@@ -92,7 +93,7 @@ class TransferList(models.Model):
         self.player.listing_status = 'Listed'
         self.player.save()
         super().save(*args, **kwargs)
-    
+
 # Create Market List Model
 
 class MarketList(models.Model):

@@ -1,7 +1,7 @@
-from collections import OrderedDict
 from drf_yasg.generators import OpenAPISchemaGenerator
-from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
+from collections import OrderedDict
+from drf_yasg import openapi
 
 
 class OrderedSchemaGenerator(OpenAPISchemaGenerator):

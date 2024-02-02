@@ -1,24 +1,25 @@
 from django.contrib import admin
 from django import forms
-from .models import *
-from .helper import *
+from .models import CustomUser, MarketList
+import pycountry
+from .helper import user_register_create_team_and_players, CountryFilter
 
 """ Customization of the admin panel """
 
 # Customize User admin page
 
-# A simple form to input user details
+# A simple form to input user details from admin panel
 
 class CustomUserForm(forms.ModelForm):
     team_name = forms.CharField(max_length=100)
-    team_country = forms.ChoiceField(choices=[(country.name, country.name) for country in pycountry.countries])
+    team_country = forms.ChoiceField(choices=[(country.name, country.name)
+                                              for country in pycountry.countries])
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'name', 
-                  'email', 'password', 
-                  'team_name', 'team_country'
-                ]
+        fields = ['username', 'name',
+                  'email', 'password',
+                  'team_name', 'team_country']
 
 class CustomUserAdmin(admin.ModelAdmin):
     list_display = ('username', 'name', 'email')
@@ -45,9 +46,8 @@ class CustomUserAdmin(admin.ModelAdmin):
                     team.country = team_country
                     team.save()
 
-
 # Customize Teams admin page
-    
+
 class TeamAdmin(admin.ModelAdmin):
 
     def owner_name(self, obj):
@@ -73,7 +73,7 @@ class PlayerAdmin(admin.ModelAdmin):
     list_filter = ('team__name', 'listing_status',)
 
 # Customize Player Transfer admin page
-    
+
 class TransferListAdmin(admin.ModelAdmin):
     def player_name(self, obj):
         return f'{obj.player.first_name} {obj.player.last_name}'
@@ -100,7 +100,7 @@ class TransferListAdmin(admin.ModelAdmin):
         MarketList.objects.create(transfer_list=obj)
 
     '''
-    To delete single player from transfer list and change 
+    To delete single player from transfer list and change
     its listing status from "Listed" to "Not Listed"
     '''
 
@@ -126,7 +126,7 @@ class TransferListAdmin(admin.ModelAdmin):
     list_filter = ('player__team__name',)
 
 # Customize Market List admin Page
-    
+
 class MarketListAdmin(admin.ModelAdmin):
     def player_name(self, obj):
         return f'{obj.transfer_list.player.first_name} {obj.transfer_list.player.last_name}'
@@ -148,12 +148,11 @@ class MarketListAdmin(admin.ModelAdmin):
         return f'$ {obj.transfer_list.asking_price}'
     price.short_description = 'Asking Price'
 
-    list_display = ('player_name', 'team_name', 'position','country', 'price')
+    list_display = ('player_name', 'team_name', 'position', 'country', 'price')
 
     '''
-    Using the CountryFilter class from .helper to 
+    Using the CountryFilter class from .helper to
     show only countries of listed players
     '''
-    
-    list_filter = ('transfer_list__player__team__name', CountryFilter)  
 
+    list_filter = ('transfer_list__player__team__name', CountryFilter)

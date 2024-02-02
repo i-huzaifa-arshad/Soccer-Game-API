@@ -1,5 +1,10 @@
 from django.urls import path
-from .views import *
+from .views import (UserRegisterView, UserLoginView,
+                    UserLogoutView, UserListView,
+                    UserDetailView, UserUpdateView,
+                    TeamUpdateView, PlayerUpdateView,
+                    UserDeleteView, TransferListView,
+                    MarketListView, BuyPlayerView)
 
 urlpatterns = [
     path('signup/', UserRegisterView.as_view(), name='user-register'),

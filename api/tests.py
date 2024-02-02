@@ -1,10 +1,22 @@
+from .models import (CustomUser, Team, Player,
+                     TransferList, MarketList)
+from .serializers import (UserRegisterSerializer, UserLoginSerializer,
+                          UserListSerializer, UserUpdateSerializer,
+                          PlayerSerializer, PlayerUpdateSerializer,
+                          TeamSerializer, TeamUpdateSerializer,
+                          UserDetailSerializer, TransferListSerializer,
+                          MarketListSerializer, BuyPlayerSerializer)
+from rest_framework.test import APITestCase
+from decimal import Decimal
+import pycountry
+import uuid
+from faker import Faker
+import random
+from random import randint
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.hashers import check_password
-from .models import *
-from .serializers import *
 
 """ Sample Test User Data Dictionary"""
 
@@ -27,6 +39,14 @@ test_user_2 = {
             'team_country': 'Ukraine',
             'budget': Decimal('5000000.00')
         }
+
+""" Countries List for Random Countries """
+
+COUNTRIES = [country.name for country in pycountry.countries]
+
+""" Faker for fake names """
+
+fake = Faker()
 
 """ Creating a Base Class for Unit Tests to avoid code redundancy """
 
@@ -504,12 +524,12 @@ class UserLoginViewTest(BaseClassForUnitTest):
         self.assertTrue('team' in response.data)
 
         # Getting message, token, team data
-        message = response.data['message']
-        token = response.data['token']
-        team = response.data['team']
-        print(f"Message: {message}")
-        print(f"Token in Login: {token}")
-        print(f"Team: {team}")
+        # message = response.data['message']
+        # token = response.data['token']
+        # team = response.data['team']
+        # print(f"Message: {message}")
+        # print(f"Token in Login: {token}")
+        # print(f"Team: {team}")
 
 """ Test for User Logout View """
 
@@ -609,7 +629,7 @@ class UserUpdateViewTest(BaseClassForUnitTest):
     def test_user_update_view(self):
         # Authenticating with token
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-        print(f"Before Update | username = {self.user.username}, name = {self.user.name}")
+        # print(f"Before Update | username = {self.user.username}, name = {self.user.name}")
 
         # Initializing new username and name
         new_username = 'new_username'
@@ -629,7 +649,7 @@ class UserUpdateViewTest(BaseClassForUnitTest):
         self.assertEqual(self.user.username, new_username)
         self.assertEqual(self.user.name, new_name)
 
-        print(f"After Update | username = {self.user.username}, name = {self.user.name}")
+        # print(f"After Update | username = {self.user.username}, name = {self.user.name}")
 
 """ Unit Test for User Delete View """
 
@@ -644,7 +664,7 @@ class UserDeleteViewTest(BaseClassForUnitTest):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         # Sending Delete request
         response = self.client.delete(self.url)
-        print(response.data)
+        # print(response.data)
 
         # Checking if the response is valid
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -664,7 +684,7 @@ class TeamUpdateViewTest(BaseClassForUnitTest):
     def test_team_update_view(self):
         # Authenticating with token
         self.client.credentials(HTTP_AUTHORIZATION='Token '+ self.token.key)
-        print(f"Before update | Team name = {self.user.team.name}, Team country = {self.user.team.country}")
+        # print(f"Before update | Team name = {self.user.team.name}, Team country = {self.user.team.country}")
 
         new_team_name = 'New Team Name'
         new_team_country = "United Kingdom"
@@ -682,7 +702,7 @@ class TeamUpdateViewTest(BaseClassForUnitTest):
         self.assertEqual(self.user.team.name, new_team_name)
         self.assertIn(self.user.team.country, COUNTRIES)
 
-        print(f"After update | Team name = {self.user.team.name}, Team country = {self.user.team.country}")
+        # print(f"After update | Team name = {self.user.team.name}, Team country = {self.user.team.country}")
 
 """ Unit Test for Player Update View """
 
@@ -699,10 +719,10 @@ class PlayerUpdateViewTest(BaseClassForUnitTest):
     def test_player_update_view(self):
         # Authenticating with token
         self.client.credentials(HTTP_AUTHORIZATION='Token '+ self.token.key)
-        print(f"Before update:")
-        print(f"Player First name = {self.player.first_name}")
-        print(f"Player Last Name = {self.player.last_name}")
-        print(f"Player country = {self.player.country}")
+        # print(f"Before update:")
+        # print(f"Player First name = {self.player.first_name}")
+        # print(f"Player Last Name = {self.player.last_name}")
+        # print(f"Player country = {self.player.country}")
 
         player_new_first_name = "New First Name"
         player_new_last_name = "New Last Name"
@@ -724,10 +744,10 @@ class PlayerUpdateViewTest(BaseClassForUnitTest):
         self.assertEqual(self.player.last_name, player_new_last_name)
         self.assertIn(self.player.country, COUNTRIES)
 
-        print(f"After update:")
-        print(f"Player First name = {self.player.first_name}")
-        print(f"Player Last Name = {self.player.last_name}")
-        print(f"Player country = {self.player.country}")
+        # print(f"After update:")
+        # print(f"Player First name = {self.player.first_name}")
+        # print(f"Player Last Name = {self.player.last_name}")
+        # print(f"Player country = {self.player.country}")
                                                    
 """ Unit Test for Transfer List View """
 
@@ -745,12 +765,12 @@ class TransferListViewTest(BaseClassForUnitTest):
         # Get the TransferList objects for the current user
         user_transfer_list = TransferList.objects.filter(player__team__owner=self.user)
         
-        print("Transfer List Before POST Request:")
-        for transfer_list in user_transfer_list:
-            print(f"Player: {transfer_list.player.first_name} {transfer_list.player.last_name}")
-            print(f"Team: {transfer_list.player.team.name}")
-            print(f"User: {transfer_list.player.team.owner.username}")
-            print(f"Asking Price: $ {transfer_list.asking_price}")
+        # print("Transfer List Before POST Request:")
+        # for transfer_list in user_transfer_list:
+        #     print(f"Player: {transfer_list.player.first_name} {transfer_list.player.last_name}")
+        #     print(f"Team: {transfer_list.player.team.name}")
+        #     print(f"User: {transfer_list.player.team.owner.username}")
+        #     print(f"Asking Price: $ {transfer_list.asking_price}")
 
         # Sending POST request
         response = self.client.post(self.url, {
@@ -764,13 +784,13 @@ class TransferListViewTest(BaseClassForUnitTest):
         # Refresh the Transfer List to see the newly added players
         user_transfer_list = TransferList.objects.filter(player__team__owner=self.user).all()
 
-        print("Transfer List After POST Request:")
-        for transfer_list in user_transfer_list:
-            transfer_list.player.refresh_from_db()
-            print(f"Player: {transfer_list.player.first_name} {transfer_list.player.last_name}")
-            print(f"Team: {transfer_list.player.team.name}")
-            print(f"User: {transfer_list.player.team.owner.username}")
-            print(f"Asking Price: $ {transfer_list.asking_price}")
+        # print("Transfer List After POST Request:")
+        # for transfer_list in user_transfer_list:
+        #     transfer_list.player.refresh_from_db()
+        #     print(f"Player: {transfer_list.player.first_name} {transfer_list.player.last_name}")
+        #     print(f"Team: {transfer_list.player.team.name}")
+        #     print(f"User: {transfer_list.player.team.owner.username}")
+        #     print(f"Asking Price: $ {transfer_list.asking_price}")
 
         # Checking if the player is in the Transfer List
         self.assertTrue(TransferList.objects.filter(player=self.player).exists())
@@ -795,12 +815,12 @@ class MarketListViewTest(BaseClassForUnitTest):
         self.assertEqual(len(response.data), MarketList.objects.count())
 
         # Printing the data
-        for market_list_data in response.data:
-            print(f"Player Name: {market_list_data['player_name']}")
-            print(f"Player Country: {market_list_data['player_country']}")
-            print(f"Team Name: {market_list_data['team_name']}")
-            print(f"Position: {market_list_data['position']}")
-            print(f"Asking Price: {market_list_data['asking_price']}")
+        # for market_list_data in response.data:
+        #     print(f"Player Name: {market_list_data['player_name']}")
+        #     print(f"Player Country: {market_list_data['player_country']}")
+        #     print(f"Team Name: {market_list_data['team_name']}")
+        #     print(f"Position: {market_list_data['position']}")
+        #     print(f"Asking Price: {market_list_data['asking_price']}")
 
 """ Unit Test for Buy Player View """
 
@@ -822,17 +842,17 @@ class BuyPlayerViewTest(BaseClassForUnitTest):
         self.client.credentials(HTTP_AUTHORIZATION='Token '+ self.token.key)
 
         # Print the before details
-        print("Before buying player:")
-        print(f"Buyer's team budget: {self.user.team.budget}")
-        print(f"Seller's team budget: {self.user2.team.budget}")
-        print(f"Buyer's team old team value: {self.user.team.team_value}")
-        print(f"Seller's team old team value: {self.user2.team.team_value}")
-        print(f"Buyer's team final value: {self.user.team.final_value}")
-        print(f"Seller's team final value: {self.user2.team.final_value}")
-        print(f"Player Name: {self.player.first_name} {self.player.last_name}")
-        print(f"Player's market value: {self.player.market_value}")
-        print(f"Player's owner: {self.player.team.owner.username}")
-        print(f"Player's listing status: {self.player.listing_status}")
+        # print("Before buying player:")
+        # print(f"Buyer's team budget: {self.user.team.budget}")
+        # print(f"Seller's team budget: {self.user2.team.budget}")
+        # print(f"Buyer's team old team value: {self.user.team.team_value}")
+        # print(f"Seller's team old team value: {self.user2.team.team_value}")
+        # print(f"Buyer's team final value: {self.user.team.final_value}")
+        # print(f"Seller's team final value: {self.user2.team.final_value}")
+        # print(f"Player Name: {self.player.first_name} {self.player.last_name}")
+        # print(f"Player's market value: {self.player.market_value}")
+        # print(f"Player's owner: {self.player.team.owner.username}")
+        # print(f"Player's listing status: {self.player.listing_status}")
 
         # Sending POST request
         response = self.client.post(self.url, {
@@ -878,15 +898,18 @@ class BuyPlayerViewTest(BaseClassForUnitTest):
         self.assertEqual(actual_message, expected_message)
 
         # Print the after details
-        print("After buying player:")
-        print(f"Buyer's team new budget: {self.user.team.budget}")
-        print(f"Seller's team new budget: {self.user2.team.budget}")
-        print(f"Buyer's team new team value: {self.user.team.team_value}")
-        print(f"Seller's team new team value: {self.user2.team.team_value}")
-        print(f"Buyer's team new final value: {self.user.team.final_value}")
-        print(f"Seller's team new final value: {self.user2.team.final_value}")
-        print(f"Player Name: {self.player.first_name} {self.player.last_name}")
-        print(f"Player's new market value: {self.player.market_value}")
-        print(f"Player's new owner: {self.player.team.owner.username}")
-        print(f"Player's listing status: {self.player.listing_status}")
+        # print("After buying player:")
+        # print(f"Buyer's team new budget: {self.user.team.budget}")
+        # print(f"Seller's team new budget: {self.user2.team.budget}")
+        # print(f"Buyer's team new team value: {self.user.team.team_value}")
+        # print(f"Seller's team new team value: {self.user2.team.team_value}")
+        # print(f"Buyer's team new final value: {self.user.team.final_value}")
+        # print(f"Seller's team new final value: {self.user2.team.final_value}")
+        # print(f"Player Name: {self.player.first_name} {self.player.last_name}")
+        # print(f"Player's new market value: {self.player.market_value}")
+        # print(f"Player's new owner: {self.player.team.owner.username}")
+        # print(f"Player's listing status: {self.player.listing_status}")
 
+#############################################################################
+#                                  THE END                                  #
+#############################################################################

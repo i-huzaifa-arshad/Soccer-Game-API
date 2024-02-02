@@ -1,6 +1,10 @@
 from rest_framework import serializers
-from .models import *
-from .helper import *
+from .models import (CustomUser, Team, Player,
+                     TransferList, MarketList)
+import pycountry
+from .helper import (user_register_create_team_and_players,
+                     transfer_list_name_instead_of_id,
+                     market_list_serializer_helper)
 
 # User Register Serializer
 
@@ -54,8 +58,7 @@ class PlayerSerializer(serializers.ModelSerializer):
         model = Player
         fields = ['id', 'first_name', 'last_name', 
                   'country', 'age', 'market_value', 
-                  'position', 'listing_status'
-                ]
+                  'position', 'listing_status']
 
 # Player Update Serializer
         
@@ -75,11 +78,10 @@ class TeamSerializer(serializers.ModelSerializer):
         model = Team
         fields = ['name', 'country', 
                   'budget', 'team_value', 
-                  'final_value', 'players'
-                ]
+                  'final_value', 'players']
 
 # Team Update Serializer
-        
+    
 class TeamUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
@@ -123,7 +125,7 @@ class MarketListSerializer(serializers.ModelSerializer):
     class Meta:
         model = MarketList
         fields = ['player_name', 'player_country', 'team_name', 'position', 'asking_price']
-    
+
     def to_representation(self, instance):
         return market_list_serializer_helper(instance)
 
@@ -142,4 +144,3 @@ class BuyPlayerSerializer(serializers.Serializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['player'].queryset = self.get_player_queryset()
-
