@@ -47,7 +47,7 @@ list players for selling on transfer list from url
 """
 
 
-def transfer_list_name_instead_of_id(instance):
+def show_transfer_list(instance):
     data = {}
     data["player"] = instance.player.first_name + " " + instance.player.last_name
     data["asking_price"] = f"$ {instance.asking_price}"
