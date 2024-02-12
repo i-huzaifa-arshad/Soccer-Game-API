@@ -1,9 +1,11 @@
-from .models import Team, Player, TransferList, MarketList
-import random
+from .models import CustomUser, Team, Player, TransferList, MarketList
 from faker import Faker
 import pycountry
+import random
 from random import randint
 from decimal import Decimal
+from rest_framework.authtoken.models import Token
+from rest_framework.exceptions import NotAuthenticated, ValidationError
 from rest_framework import status
 from rest_framework.response import Response
 from django.contrib.admin import SimpleListFilter
@@ -72,12 +74,35 @@ def market_list_serializer_helper(obj):
 
 
 """
+Helper Base Class for User Authentication to
+avoid redundancy in views
+"""
+
+
+class UserAuthentication:
+    def check_user_not_logged_in(self, username):
+        user = CustomUser.objects.get(username=username)
+        token = Token.objects.filter(user=user)
+        if not token.exists():
+            raise NotAuthenticated(f"User *{username}* not logged in.")
+        return user, token
+
+    def check_user_already_logged_in(self, username):
+        user = CustomUser.objects.get(username=username)
+        token = Token.objects.filter(user=user)
+        if token.exists():
+            raise ValidationError(f"User *{username}* already logged in.")
+        return user, token
+
+
+"""
 Helper function for Buy Player View Calculations
 """
 
 
 def buy_player(serializer, username):
-    player = serializer.validated_data["player"]
+    player_id = serializer.validated_data["player_id"]
+    player = Player.objects.get(id=player_id)
     buyer_team = Team.objects.get(owner__username=username)
     seller_team = player.team
 

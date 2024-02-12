@@ -126,16 +126,25 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 
 class TransferListSerializer(serializers.ModelSerializer):
-    player = serializers.PrimaryKeyRelatedField(queryset=Player.objects.none())
+    player_id = serializers.UUIDField(write_only=True)
 
     class Meta:
         model = TransferList
-        fields = ["player", "asking_price"]
+        fields = ["player_id", "asking_price"]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if "context" in kwargs and "players" in kwargs["context"]:
-            self.fields["player"].queryset = kwargs["context"]["players"]
+    def validate_player_id(self, value):
+        try:
+            player = Player.objects.get(id=value)
+            return player
+        except Player.DoesNotExist:
+            raise serializers.ValidationError(
+                "Player with this ID does not exist in the team!"
+            )
+
+    def create(self, validated_data):
+        player = validated_data.pop("player_id")
+        transfer_list = TransferList.objects.create(player=player, **validated_data)
+        return transfer_list
 
     def to_representation(self, instance):
         return transfer_list_name_instead_of_id(instance)
@@ -169,15 +178,12 @@ class MarketListSerializer(serializers.ModelSerializer):
 
 
 class BuyPlayerSerializer(serializers.Serializer):
-    player = serializers.PrimaryKeyRelatedField(queryset=Player.objects.none())
+    player_id = serializers.UUIDField()
     price = serializers.DecimalField(max_digits=10, decimal_places=2)
 
-    def get_player_queryset(self):
-        username = self.context.get("view").kwargs["username"]
-        user = CustomUser.objects.get(username=username)
-        user_team = Team.objects.get(owner=user)
-        return Player.objects.filter(listing_status="Listed").exclude(team=user_team)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["player"].queryset = self.get_player_queryset()
+    def validate_player_id(self, value):
+        try:
+            player = Player.objects.get(id=value)
+        except Player.DoesNotExist:
+            raise serializers.ValidationError("Player does not exist")
+        return value
