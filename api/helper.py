@@ -59,15 +59,16 @@ Helper Function for Market List Serializer
 """
 
 
-def market_list_serializer_helper(obj):
+def show_market_list(market_list_instance):
     data = {}
+    data["player_id"] = market_list_instance.transfer_list.player.id
     data["player_name"] = (
-        f"{obj.transfer_list.player.first_name} {obj.transfer_list.player.last_name}"
+        f"{market_list_instance.transfer_list.player.first_name} {market_list_instance.transfer_list.player.last_name}"
     )
-    data["player_country"] = obj.transfer_list.player.country
-    data["team_name"] = obj.transfer_list.player.team.name
-    data["position"] = obj.transfer_list.player.position
-    data["asking_price"] = f"$ {obj.transfer_list.asking_price}"
+    data["player_country"] = market_list_instance.transfer_list.player.country
+    data["team_name"] = market_list_instance.transfer_list.player.team.name
+    data["position"] = market_list_instance.transfer_list.player.position
+    data["asking_price"] = f"$ {market_list_instance.transfer_list.asking_price}"
     return data
 
 
