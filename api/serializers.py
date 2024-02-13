@@ -53,9 +53,17 @@ class UserListSerializer(serializers.ModelSerializer):
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False)
+
     class Meta:
         model = CustomUser
-        fields = ["username", "name"]
+        fields = ["username", "name", "password"]
+
+    def update(self, instance, validated_data):
+        if "password" in validated_data:
+            password = validated_data.pop("password")
+            instance.set_password(password)
+        return super().update(instance, validated_data)
 
 
 # Player Details Serializer
