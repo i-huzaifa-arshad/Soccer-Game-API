@@ -59,7 +59,7 @@ Helper Function for Market List Serializer
 """
 
 
-def show_market_list(market_list_instance):
+def market_list_serializer_helper(market_list_instance):
     data = {}
     data["player_id"] = market_list_instance.transfer_list.player.id
     data["player_name"] = (

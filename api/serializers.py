@@ -4,7 +4,7 @@ import pycountry
 from .helper import (
     user_register_create_team_and_players,
     transfer_list_name_instead_of_id,
-    show_market_list,
+    market_list_serializer_helper,
 )
 
 # User Register Serializer
@@ -164,7 +164,7 @@ class MarketListSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        return show_market_list(instance)
+        return market_list_serializer_helper(instance)
 
 
 # Player Buy
