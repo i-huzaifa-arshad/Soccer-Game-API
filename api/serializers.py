@@ -3,8 +3,8 @@ from .models import CustomUser, Team, Player, TransferList, MarketList
 import pycountry
 from .helper import (
     user_register_create_team_and_players,
-    show_transfer_list,
-    market_list_serializer_helper,
+    get_player_name_and_price,
+    show_market_list_data,
 )
 
 # User Register Serializer
@@ -138,7 +138,7 @@ class TransferListSerializer(serializers.ModelSerializer):
             self.fields["player"].queryset = kwargs["context"]["players"]
 
     def to_representation(self, instance):
-        return show_transfer_list(instance)
+        return get_player_name_and_price(instance)
 
 
 # Market List
@@ -162,7 +162,7 @@ class MarketListSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        return market_list_serializer_helper(instance)
+        return show_market_list_data(instance)
 
 
 # Player Buy
