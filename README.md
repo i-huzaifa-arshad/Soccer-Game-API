@@ -79,7 +79,7 @@ You can use Postman to access these api endpoints:
     {
   "email": "user@example.com",
   "password": "string"
-}
+    }
     ```
 - It will successfully login the user and provide the `token`. Copy this token to use for other endpoints which require authentication.
 
