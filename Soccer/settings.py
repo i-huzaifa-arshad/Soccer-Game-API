@@ -131,3 +131,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # I added
 
 AUTH_USER_MODEL = "api.CustomUser"
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication"
+    ],
+}
+
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {
+        "Token": {"type": "apiKey", "in": "header", "name": "Authorization"}
+    },
+}

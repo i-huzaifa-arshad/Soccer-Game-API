@@ -1,9 +1,10 @@
 from .models import Team, Player, TransferList, MarketList
-import random
 from faker import Faker
 import pycountry
+import random
 from random import randint
 from decimal import Decimal
+from rest_framework.permissions import BasePermission
 from rest_framework import status
 from rest_framework.response import Response
 from django.contrib.admin import SimpleListFilter
@@ -42,6 +43,19 @@ def user_register_create_team_and_players(user, team_name, team_country):
 
 
 """
+Helper permission class for checking if the token provided
+matches for the user whose username is passed in the url
+"""
+
+
+class CheckTokenUserMatch(BasePermission):
+    message = "Invalid token."
+
+    def has_object_permission(self, request, _, user):
+        return request.user == user
+
+
+"""
 Helper function to show full name of players when a user
 list players for selling on transfer list from url
 """
@@ -77,7 +91,8 @@ Helper function for Buy Player View Calculations
 
 
 def buy_player(serializer, username):
-    player = serializer.validated_data["player"]
+    player_id = serializer.validated_data["player_id"]
+    player = Player.objects.get(id=player_id)
     buyer_team = Team.objects.get(owner__username=username)
     seller_team = player.team
 
