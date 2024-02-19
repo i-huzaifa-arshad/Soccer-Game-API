@@ -1,5 +1,4 @@
 # Soccer Online Game Manager App API
-![Soccer](api/static/Soccer.jpg)
 
 A Django REST Framework based project for Soccer API app. The API includes features such as user registration, login, player transfer, player buy and more.
 
