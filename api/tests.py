@@ -515,7 +515,7 @@ class BuyPlayerSerializerTest(BaseClassForUnitTest):
     def test_buy_player_serializer(self):
         # Create a dictionary with player and price data
         data = {
-            "player": str(self.players2[0].id),
+            "player_id": str(self.players2[0].id),
             "price": self.transfer_list2.asking_price,
         }
 
@@ -523,13 +523,13 @@ class BuyPlayerSerializerTest(BaseClassForUnitTest):
         self.kwargs = {"username": test_user["username"]}
 
         # Initialize the serializer with the data and context
-        serializer = BuyPlayerSerializer(data=data, context={"view": self})
+        serializer = BuyPlayerSerializer(data=data)
 
         # Check if the serializer is valid
         self.assertTrue(serializer.is_valid())
 
         # Check if the player and price in the validated data are correct
-        self.assertEqual(serializer.validated_data["player"], self.players2[0])
+        self.assertEqual(serializer.validated_data["player_id"], self.players2[0].id)
         self.assertEqual(serializer.validated_data["price"], Decimal(5500.00))
 
 
@@ -711,10 +711,11 @@ class UserUpdateViewTest(BaseClassForUnitTest):
         # Initializing new username and name
         new_username = "new_username"
         new_name = "New Name"
+        new_password = "new_password"
 
         # Sending PUT request
         response = self.client.put(
-            self.url, {"username": new_username, "name": new_name}, format="json"
+            self.url, {"username": new_username, "name": new_name, "password": new_password}, format="json"
         )
 
         # Checking if the response is valid
@@ -724,6 +725,7 @@ class UserUpdateViewTest(BaseClassForUnitTest):
         self.user.refresh_from_db()  # Refresh the user object from the database
         self.assertEqual(self.user.username, new_username)
         self.assertEqual(self.user.name, new_name)
+        self.assertTrue(self.user.check_password(new_password))
 
         # print(f"After Update | username = {self.user.username}, name = {self.user.name}")
 
@@ -868,7 +870,7 @@ class TransferListViewTest(BaseClassForUnitTest):
         # Sending POST request
         response = self.client.post(
             self.url,
-            {"player": self.player.id, "asking_price": "125000.00"},
+            {"player_id": self.player.id, "asking_price": "125000.00"},
             format="json",
         )
 
@@ -957,7 +959,10 @@ class BuyPlayerViewTest(BaseClassForUnitTest):
         # Sending POST request
         response = self.client.post(
             self.url,
-            {"player": self.player.id, "price": str(self.asking_price)},
+            {
+                "player_id": self.player.id, 
+                "price": str(self.asking_price)
+            },
             format="json",
         )
 

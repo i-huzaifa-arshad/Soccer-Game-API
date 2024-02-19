@@ -142,7 +142,7 @@ class TeamUpdateView(generics.UpdateAPIView):
     queryset = Team.objects.all()
     serializer_class = TeamUpdateSerializer
     lookup_field = "owner__username"
-    permission_classes = [IsAuthenticated, CheckTokenUserMatch]
+    permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
 
 
@@ -153,7 +153,7 @@ class PlayerUpdateView(generics.UpdateAPIView):
     queryset = Player.objects.all()
     serializer_class = PlayerUpdateSerializer
     lookup_field = "id"
-    permission_classes = [IsAuthenticated, CheckTokenUserMatch]
+    permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
 
 
