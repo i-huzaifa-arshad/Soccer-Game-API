@@ -36,7 +36,7 @@ COUNTRIES = [country.name for country in pycountry.countries]
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=15, null=True)
+    username = models.CharField(max_length=15, null=True, unique=True)
     name = models.CharField(max_length=20, null=True)
     email = models.EmailField(verbose_name="email address", unique=True)
     is_active = models.BooleanField(default=True)
