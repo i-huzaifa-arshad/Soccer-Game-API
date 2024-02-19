@@ -203,10 +203,12 @@ class MarketListView(generics.ListAPIView):
     serializer_class = MarketListSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = [
+        "transfer_list__player__id",
         "transfer_list__player__first_name",
         "transfer_list__player__last_name",
         "transfer_list__player__country",
         "transfer_list__player__team__name",
+        "transfer_list__player__position",
         "transfer_list__asking_price",
     ]
 

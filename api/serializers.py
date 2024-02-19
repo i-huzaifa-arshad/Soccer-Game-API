@@ -162,6 +162,7 @@ class TransferListSerializer(serializers.ModelSerializer):
 
 
 class MarketListSerializer(serializers.ModelSerializer):
+    player_id = serializers.SerializerMethodField()
     player_name = serializers.SerializerMethodField()
     player_country = serializers.SerializerMethodField()
     team_name = serializers.SerializerMethodField()
@@ -171,6 +172,7 @@ class MarketListSerializer(serializers.ModelSerializer):
     class Meta:
         model = MarketList
         fields = [
+            "player_id",
             "player_name",
             "player_country",
             "team_name",
