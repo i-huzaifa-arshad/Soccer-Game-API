@@ -49,7 +49,6 @@ python manage.py migrate
 
 ```
 python manage.py createsuperuser
-
 ```
 7. Run the server:
 
