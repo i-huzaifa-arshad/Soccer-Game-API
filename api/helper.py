@@ -47,7 +47,7 @@ list players for selling on transfer list from url
 """
 
 
-def transfer_list_name_instead_of_id(instance):
+def get_player_name_and_price(instance):
     data = {}
     data["player"] = instance.player.first_name + " " + instance.player.last_name
     data["asking_price"] = f"$ {instance.asking_price}"
@@ -59,7 +59,7 @@ Helper Function for Market List Serializer
 """
 
 
-def market_list_serializer_helper(obj):
+def show_market_list_data(obj):
     data = {}
     data["player_name"] = (
         f"{obj.transfer_list.player.first_name} {obj.transfer_list.player.last_name}"
