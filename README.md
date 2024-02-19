@@ -38,7 +38,6 @@ cd Soccer-Game-API
 4. Install the required packages:
 ```
 pip install -r requirements.txt
-
 ```
 5. Apply the migrations:
 
