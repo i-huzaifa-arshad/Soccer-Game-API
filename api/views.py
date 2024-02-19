@@ -44,9 +44,7 @@ class UserLoginView(generics.GenericAPIView):
             token, created = Token.objects.get_or_create(user=user)
             if not created:
                 return Response(
-                    {
-                        "message": f"User *{user.username}* already logged in with token {token.key}"
-                    },
+                    {"message": f"User *{user.username}* already logged in."},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             else:
