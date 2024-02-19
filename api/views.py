@@ -90,6 +90,8 @@ class UserLogoutView(generics.DestroyAPIView):
 class UserListView(generics.ListAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserListSerializer
+    permission_classes = [IsAuthenticated, CheckTokenUserMatch]
+    authentication_classes = [TokenAuthentication]
 
 
 # User Details
@@ -199,6 +201,8 @@ class TransferListView(generics.ListCreateAPIView):
 
 class MarketListView(generics.ListAPIView):
     serializer_class = MarketListSerializer
+    permission_classes = [IsAuthenticated, CheckTokenUserMatch]
+    authentication_classes = [TokenAuthentication]
     filter_backends = [filters.SearchFilter]
     search_fields = [
         "transfer_list__player__id",
