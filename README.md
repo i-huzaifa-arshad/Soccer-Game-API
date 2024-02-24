@@ -59,7 +59,7 @@ python manage.py runserver
 
 Open `http://localhost:8000/` or `http://127.0.0.1:8000/` when the server is running to see the Swagger API documentation.
 
-- The `signup`, `login`, `list_users`, and `market_list` endpoints do not need authentication from user.
+- The `signup` and `login` endpoints do not need authentication from user.
 - For other endpoints, a `Token` is required to use the endpoints.
 - When user login, a token is generated. Use that token to access other endpoints:
     - Click on `Authorize` button on homepage of Swagger documentation.
