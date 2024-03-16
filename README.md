@@ -14,7 +14,7 @@ Following instructions will help you on how to setup and use this project on you
 
 1. Clone the repository:
 ```
-    git clone https://github.com/i-huzaifa-arshad/Soccer-Game-API
+git clone https://github.com/i-huzaifa-arshad/Soccer-Game-API
 ```
 
 2. Navigate to the project directory:
